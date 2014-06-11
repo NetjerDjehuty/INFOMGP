@@ -1,0 +1,6 @@
+*.pdb
+*.exe
+*.suo
+*.userprefs
+Bullet/BulletLIB/*
+Temporary Files
