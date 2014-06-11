@@ -151,6 +151,10 @@ void Application::exitPhysics() {
 }
 
 void Application::update() {	
+	
+	// Always draw the COM
+	if(!m_creature->m_showCOM)
+		m_creature->switchCOM();
 
 	// Do not update time if creature fallen
 	if (!m_creature->hasFallen()) m_currentTime = GetTickCount();

@@ -14,6 +14,7 @@ public:
 	void update(int elapsedTime);		// Update the creature state
 	bool hasFallen();					// Return if the creature has fallen down
 	void switchCOM();					// Activate / Deactivate the visualization of the COM
+	bool m_showCOM;						// Show COM
 
 	btVector3 getCOM() {return m_positionCOM;}	// Return the position of the COM
 
@@ -34,7 +35,6 @@ protected:
 
 	btCollisionShape	*	m_COMShape;		// Shape for COM
 	btRigidBody			*	m_COM;			// Body COM
-	bool					m_showCOM;		// Show COM
 	btVector3				m_positionCOM;	// Position COM
 	btVector3 computeCenterOfMass();		// Compute the COM of the creature in world coordinate system
 
