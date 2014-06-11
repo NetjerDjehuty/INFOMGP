@@ -15,3 +15,7 @@ RCb01792
 *.suo
 *.exe
 Temporary Files\*
+*.idb
+*.ilk
+*.opensdf
+*.res
