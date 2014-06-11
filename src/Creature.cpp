@@ -23,6 +23,10 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 		m_shapes[Creature::BODYPART_LOWER_LEG]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
 		m_shapes[Creature::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.40));
 		m_shapes[Creature::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
+		m_shapes[Creature::BODYPART_UPPER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
+		m_shapes[Creature::BODYPART_UPPER_ARM]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
+		m_shapes[Creature::BODYPART_LOWER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
+		m_shapes[Creature::BODYPART_LOWER_ARM]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
 
 		// Setup the body properties
 		btTransform offset; offset.setIdentity();
@@ -43,6 +47,16 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 		transform.setIdentity();
 		transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.725), btScalar(0.0)));
 		m_bodies[Creature::BODYPART_UPPER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Creature::BODYPART_UPPER_LEG]);
+
+		// UPPER_ARM
+		transform.setIdentity();
+		transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.725), btScalar(0.0)));
+		m_bodies[Creature::BODYPART_UPPER_ARM] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Creature::BODYPART_UPPER_ARM]);
+
+		// LOWER_ARM
+		transform.setIdentity();
+		transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.375), btScalar(0.0)));
+		m_bodies[Creature::BODYPART_LOWER_ARM] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Creature::BODYPART_LOWER_ARM]);
 
 		// Add damping to the rigid bodies
 		for (int i = 0; i < Creature::BODYPART_COUNT; ++i) {
@@ -85,6 +99,31 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 		hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 		m_ownerWorld->addConstraint(m_joints[JOINT_KNEE], true);
 
+		// ELBOW
+		localA.setIdentity(); localB.setIdentity();
+		localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.125), btScalar(0.0)));
+		localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
+		hingeJoint = new btHingeConstraint(*m_bodies[Creature::BODYPART_LOWER_ARM], *m_bodies[Creature::BODYPART_UPPER_ARM], localA, localB);
+		hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
+		
+		//hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+
+		m_joints[Creature::JOINT_ELBOW] = hingeJoint;
+		hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
+		m_ownerWorld->addConstraint(m_joints[JOINT_ELBOW], true);
+
+		// SHOULDER
+		localA.setIdentity(); localB.setIdentity();
+		localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.125), btScalar(0.0)));
+		localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
+		hingeJoint = new btHingeConstraint(*m_bodies[Creature::BODYPART_UPPER_LEG], *m_bodies[Creature::BODYPART_UPPER_ARM], localA, localB);
+		hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
+		
+		//hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+
+		m_joints[Creature::JOINT_SHOULDER] = hingeJoint;
+		hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
+		m_ownerWorld->addConstraint(m_joints[JOINT_SHOULDER], true);
 }
 
 Creature::~Creature() { // Destructor

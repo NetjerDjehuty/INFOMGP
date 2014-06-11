@@ -20,9 +20,9 @@ public:
 
 protected:
 
-	enum {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG,BODYPART_COUNT}; // Body parts of the creature
+	enum {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG,BODYPART_UPPER_ARM, BODYPART_LOWER_ARM, BODYPART_COUNT}; // Body parts of the creature
 
-	enum {JOINT_ANKLE,JOINT_KNEE,JOINT_COUNT}; // Joints of the creature
+	enum {JOINT_ANKLE, JOINT_KNEE, JOINT_ELBOW, JOINT_SHOULDER, JOINT_COUNT}; // Joints of the creature
 
 	btDynamicsWorld		*	m_ownerWorld;				// The physics world of the simulation
 	btCollisionShape	*	m_shapes[BODYPART_COUNT];	// The primitive shape of each body part used in collision
