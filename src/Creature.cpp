@@ -66,7 +66,7 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 		hingeJoint =  new btHingeConstraint(*m_bodies[Creature::BODYPART_FOOT], *m_bodies[Creature::BODYPART_LOWER_LEG], localA, localB);
 		hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
 		
-		//hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+		hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
 		
 		m_joints[Creature::JOINT_ANKLE] = hingeJoint;
 		hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -78,8 +78,8 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 		localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.20), btScalar(0.0)));
 		hingeJoint = new btHingeConstraint(*m_bodies[Creature::BODYPART_LOWER_LEG], *m_bodies[Creature::BODYPART_UPPER_LEG], localA, localB);
 		hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
-
-		//hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+		
+		hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
 
 		m_joints[Creature::JOINT_KNEE] = hingeJoint;
 		hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -150,12 +150,23 @@ void Creature::update(int elapsedTime) {
 		if (((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->getEnableAngularMotor()) { // ragdoll is fallen
 			((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->enableMotor(false);
 			((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->enableMotor(false);
+
+			((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setEnabled(false);
+			((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->setEnabled(false);
 		}
 		return;
 	}			
 
 	if (elapsedTime - lastChange > 10) { // Update balance control only every 10 ms
 		lastChange = elapsedTime;
+
+		btVector3 COM, COMU, COA;
+		COA = m_bodies[BODYPART_FOOT]->getCenterOfMassPosition();
+		COM = computeCenterOfMass();
+		COMU = m_bodies[BODYPART_UPPER_LEG]->getCenterOfMassPosition();
+
+		((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() - COA.z()) * 50.0f );
+		((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->setMotorTarget( btScalar( COA.x() - COMU.x()) * 25.0f );
 
 		//=================== TODO ===================//
 	
@@ -197,8 +208,17 @@ bool Creature::hasFallen() {
 
 btVector3 Creature::computeCenterOfMass() {
 
+	btVector3 ret(0,0,0);
+	float totMass = 0.0f;
+
+	for (int i = 0; i < BODYPART_COUNT; i++)
+	{
+		totMass += (1.0f/m_bodies[i]->getInvMass());
+		ret +=	m_bodies[i]->getCenterOfMassPosition() / m_bodies[i]->getInvMass();
+	}
+
 	//=================== TODO ==================//
-	return btVector3(0,0,0);
+	return ret/totMass;
 	//===========================================//
 
 }

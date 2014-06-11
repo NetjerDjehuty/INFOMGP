@@ -1,0 +1,17 @@
+Assignment.vcxproj.filters
+Assignment.vcxproj
+Assignment.rc
+*.lib
+*.log
+*.obj
+*.tlog
+*.lastbuildstate
+*.pdb
+*.sdf
+*.lib
+*.vcxproj
+RCa01792
+RCb01792
+*.suo
+*.exe
+Temporary Files\*
