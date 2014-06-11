@@ -12,100 +12,100 @@
 #define M_PI_4     0.785398163397448309616
 
 Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset) : m_ownerWorld (ownerWorld), m_hasFallen(false), lastChange(0), m_showCOM(false) { // Constructor
-		
-		// Setup the rigid bodies
-		// ======================
 
-		// Setup the collision shapes
-		m_shapes[Creature::BODYPART_FOOT] = new btBoxShape(btVector3(btScalar(0.1),btScalar(0.025),btScalar(0.12)));
-		m_shapes[Creature::BODYPART_FOOT]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
-		m_shapes[Creature::BODYPART_LOWER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.50));
-		m_shapes[Creature::BODYPART_LOWER_LEG]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
-		m_shapes[Creature::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.40));
-		m_shapes[Creature::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
+	// Setup the rigid bodies
+	// ======================
 
-		// Setup the body properties
-		btTransform offset; offset.setIdentity();
-		offset.setOrigin(positionOffset); // absolute initial starting position
-		btTransform transform;
+	// Setup the collision shapes
+	m_shapes[Creature::BODYPART_FOOT] = new btBoxShape(btVector3(btScalar(0.1),btScalar(0.025),btScalar(0.12)));
+	m_shapes[Creature::BODYPART_FOOT]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
+	m_shapes[Creature::BODYPART_LOWER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.50));
+	m_shapes[Creature::BODYPART_LOWER_LEG]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
+	m_shapes[Creature::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.40));
+	m_shapes[Creature::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
 
-		// FOOT
-		transform.setIdentity();
-		transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
-		m_bodies[Creature::BODYPART_FOOT] = m_ownerWorld->localCreateRigidBody(btScalar(5.0), offset*transform, m_shapes[Creature::BODYPART_FOOT]);
+	// Setup the body properties
+	btTransform offset; offset.setIdentity();
+	offset.setOrigin(positionOffset); // absolute initial starting position
+	btTransform transform;
 
-		// LOWER_LEG
-		transform.setIdentity();
-		transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.275), btScalar(0.0)));
-		m_bodies[Creature::BODYPART_LOWER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Creature::BODYPART_LOWER_LEG]);
+	// FOOT
+	transform.setIdentity();
+	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
+	m_bodies[Creature::BODYPART_FOOT] = m_ownerWorld->localCreateRigidBody(btScalar(5.0), offset*transform, m_shapes[Creature::BODYPART_FOOT]);
 
-		// UPPER_LEG
-		transform.setIdentity();
-		transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.725), btScalar(0.0)));
-		m_bodies[Creature::BODYPART_UPPER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Creature::BODYPART_UPPER_LEG]);
+	// LOWER_LEG
+	transform.setIdentity();
+	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.275), btScalar(0.0)));
+	m_bodies[Creature::BODYPART_LOWER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Creature::BODYPART_LOWER_LEG]);
 
-		// Add damping to the rigid bodies
-		for (int i = 0; i < Creature::BODYPART_COUNT; ++i) {
-			m_bodies[i]->setDamping(btScalar(0.01), btScalar(0.01));
-			m_bodies[i]->setDeactivationTime(btScalar(0.01));
-			m_bodies[i]->setSleepingThresholds(btScalar(5.0), btScalar(5.0));
-		}
-		m_bodies[Creature::BODYPART_FOOT]->setDamping(btScalar(0.8), btScalar(0.01)); // Higher friction for foot
+	// UPPER_LEG
+	transform.setIdentity();
+	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.725), btScalar(0.0)));
+	m_bodies[Creature::BODYPART_UPPER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Creature::BODYPART_UPPER_LEG]);
 
-		// Setup the joint constraints
-		// ===========================
+	// Add damping to the rigid bodies
+	for (int i = 0; i < Creature::BODYPART_COUNT; ++i) {
+		m_bodies[i]->setDamping(btScalar(0.01), btScalar(0.01));
+		m_bodies[i]->setDeactivationTime(btScalar(0.01));
+		m_bodies[i]->setSleepingThresholds(btScalar(5.0), btScalar(5.0));
+	}
+	m_bodies[Creature::BODYPART_FOOT]->setDamping(btScalar(0.8), btScalar(0.01)); // Higher friction for foot
 
-		btHingeConstraint* hingeJoint;
-		//FYI, another type of joint is for example: btConeTwistConstraint* coneJoint;
-		btTransform localA, localB;
+	// Setup the joint constraints
+	// ===========================
 
-		// ANKLE
-		localA.setIdentity(); localB.setIdentity();
-		localA.getBasis().setEulerZYX(0,btScalar(M_PI_2),0); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.025), btScalar(0.0)));
-		localB.getBasis().setEulerZYX(0,btScalar(M_PI_2),0); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.25), btScalar(0.0)));
-		hingeJoint =  new btHingeConstraint(*m_bodies[Creature::BODYPART_FOOT], *m_bodies[Creature::BODYPART_LOWER_LEG], localA, localB);
-		hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
-		
-		hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
-		
-		m_joints[Creature::JOINT_ANKLE] = hingeJoint;
-		hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
-		m_ownerWorld->addConstraint(m_joints[Creature::JOINT_ANKLE], true);
+	btHingeConstraint* hingeJoint;
+	//FYI, another type of joint is for example: btConeTwistConstraint* coneJoint;
+	btTransform localA, localB;
 
-		// KNEE
-		localA.setIdentity(); localB.setIdentity();
-		localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.25), btScalar(0.0)));
-		localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.20), btScalar(0.0)));
-		hingeJoint = new btHingeConstraint(*m_bodies[Creature::BODYPART_LOWER_LEG], *m_bodies[Creature::BODYPART_UPPER_LEG], localA, localB);
-		hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
-		
-		hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+	// ANKLE
+	localA.setIdentity(); localB.setIdentity();
+	localA.getBasis().setEulerZYX(0,btScalar(M_PI_2),0); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.025), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0,btScalar(M_PI_2),0); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.25), btScalar(0.0)));
+	hingeJoint =  new btHingeConstraint(*m_bodies[Creature::BODYPART_FOOT], *m_bodies[Creature::BODYPART_LOWER_LEG], localA, localB);
+	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
 
-		m_joints[Creature::JOINT_KNEE] = hingeJoint;
-		hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
-		m_ownerWorld->addConstraint(m_joints[JOINT_KNEE], true);
+	hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+
+	m_joints[Creature::JOINT_ANKLE] = hingeJoint;
+	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
+	m_ownerWorld->addConstraint(m_joints[Creature::JOINT_ANKLE], true);
+
+	// KNEE
+	localA.setIdentity(); localB.setIdentity();
+	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.25), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.20), btScalar(0.0)));
+	hingeJoint = new btHingeConstraint(*m_bodies[Creature::BODYPART_LOWER_LEG], *m_bodies[Creature::BODYPART_UPPER_LEG], localA, localB);
+	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
+
+	hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+
+	m_joints[Creature::JOINT_KNEE] = hingeJoint;
+	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
+	m_ownerWorld->addConstraint(m_joints[JOINT_KNEE], true);
 
 }
 
 Creature::~Creature() { // Destructor
-		// Remove all joint constraints
-		for (int i = 0; i < Creature::JOINT_COUNT; ++i) {
-			m_ownerWorld->removeConstraint(m_joints[i]);
-			delete m_joints[i]; m_joints[i] = NULL;
-		}		
-		// Remove all bodies and shapes
-		for (int i = 0; i < Creature::BODYPART_COUNT; ++i) {
-			m_ownerWorld->removeRigidBody(m_bodies[i]);			
-			delete m_bodies[i]->getMotionState();
-			delete m_bodies[i]; m_bodies[i] = NULL;
-			delete m_shapes[i]; m_shapes[i] = NULL;
-		}
-		if (m_showCOM) {
-			m_ownerWorld->removeRigidBody(m_COM);
-			delete m_COM->getMotionState();
-			delete m_COM; m_COM = NULL;
-			delete m_COMShape; m_COMShape = NULL;
-		}
+	// Remove all joint constraints
+	for (int i = 0; i < Creature::JOINT_COUNT; ++i) {
+		m_ownerWorld->removeConstraint(m_joints[i]);
+		delete m_joints[i]; m_joints[i] = NULL;
+	}		
+	// Remove all bodies and shapes
+	for (int i = 0; i < Creature::BODYPART_COUNT; ++i) {
+		m_ownerWorld->removeRigidBody(m_bodies[i]);			
+		delete m_bodies[i]->getMotionState();
+		delete m_bodies[i]; m_bodies[i] = NULL;
+		delete m_shapes[i]; m_shapes[i] = NULL;
+	}
+	if (m_showCOM) {
+		m_ownerWorld->removeRigidBody(m_COM);
+		delete m_COM->getMotionState();
+		delete m_COM; m_COM = NULL;
+		delete m_COMShape; m_COMShape = NULL;
+	}
 }
 
 void Creature::switchCOM() {
@@ -131,7 +131,7 @@ void Creature::switchCOM() {
 }
 
 void Creature::update(int elapsedTime) {
-	
+
 	// BALANCE CONTROLLER
 	// ==================
 
@@ -160,16 +160,27 @@ void Creature::update(int elapsedTime) {
 	if (elapsedTime - lastChange > 10) { // Update balance control only every 10 ms
 		lastChange = elapsedTime;
 
-		btVector3 COM, COMU, COA;
+		btVector3 COM, COA;
 		COA = m_bodies[BODYPART_FOOT]->getCenterOfMassPosition();
 		COM = computeCenterOfMass();
-		COMU = m_bodies[BODYPART_UPPER_LEG]->getCenterOfMassPosition();
 
-		((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() - COA.z()) * 50.0f );
-		((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->setMotorTarget( btScalar( COA.x() - COMU.x()) * 25.0f );
+		btTransform trFoot = m_bodies[Creature::BODYPART_FOOT]->getWorldTransform();
+		btQuaternion fRot = trFoot.getRotation();
+		btScalar mag = sqrt(fRot.w()*fRot.w() + fRot.y()*fRot.y());
+		btScalar yaw = 2*acos(fRot.w()/mag); //... I think...
+
+		btTransform yawRot; yawRot.setIdentity();
+		yawRot.setRotation(btQuaternion(yaw,0,0));
+		yawRot = yawRot.inverse();
+
+		COM = yawRot * COM;
+		COA = yawRot * COA;
+
+		((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() - COA.z() ) * 20.0f );
+		((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->setMotorTarget( btScalar( COA.x() - COM.x() ) * 25.0f );
 
 		//=================== TODO ===================//
-	
+
 		// Step 2: Describe the ground projected CSP in world coordinate system
 
 		// ANKLE
