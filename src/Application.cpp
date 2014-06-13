@@ -10,10 +10,11 @@
 
 #include "Application.h"
 #include "Creature.h"
+//#include "destructulon.h"
 #include "Scene.h"
 
 void Application::initPhysics() {
-	
+
 	// Setup the basic world
 	// =====================
 	setTexturing(true);
@@ -49,6 +50,8 @@ void Application::initPhysics() {
 void Application::resetScene(const btVector3& startOffset) {
 	if (m_creature != NULL) delete m_creature;
 	m_creature = new Creature(m_dynamicsWorld, startOffset);
+/*	if (m_destructulon != NULL) delete m_destructulon;
+	m_destructulon = new Destructulon(m_dynamicsWorld, startOffset);*/
 	if (m_scene != NULL) delete m_scene;
 	m_scene = new Scene(m_dynamicsWorld);
 	m_startTime = GetTickCount();
@@ -90,32 +93,48 @@ void Application::displayCallback() {
 }
 
 void Application::keyboardCallback(unsigned char key, int x, int y) {
-    // You can add your key bindings here.
-    // Be careful to not use a key already listed in DemoApplication::keyboardCallback
+	// You can add your key bindings here.
+	// Be careful to not use a key already listed in DemoApplication::keyboardCallback
 	switch (key) {
-		case 'e':
+	/*case 'a': // move left arm for player 1
+		{
+			if(m_creature->name == "Destructulon")
 			{
-				btVector3 startOffset(0,0.55,0);
-				resetScene(startOffset);
-				break;
+				m_creature->m_bodies[m_creature->BODYPART_LOWER_L_ARM]->applyForce(btVector3(0,0,910), btVector3(0,1.5,0));
 			}
-		case 'r':
+			break;
+		}
+	case 'd': // move right arm for player 1
+		{
+			if(m_creature->name == "Destructulon")
 			{
-				m_scene->switchPlatform();
-				break;
+				m_creature->m_bodies[m_creature->BODYPART_LOWER_ARM]->applyForce(btVector3(0,0,910), btVector3(0,1.5,0));
 			}
-		case 't':
-			{
-				m_scene->switchBall();
-				break;
-			}
-		case 'y':
-			{
-				m_creature->switchCOM();
-				break;
-			}
-		default :
-			DemoApplication::keyboardCallback(key, x, y);
+			break;
+		}*/
+	case 'e':
+		{
+			btVector3 startOffset(0,0.55,0);
+			resetScene(startOffset);
+			break;
+		}
+	case 'r':
+		{
+			m_scene->switchPlatform();
+			break;
+		}
+	case 't':
+		{
+			m_scene->switchBall();
+			break;
+		}
+	case 'y':
+		{
+			m_creature->switchCOM();
+			break;
+		}
+	default :
+		DemoApplication::keyboardCallback(key, x, y);
 	}	
 }
 
@@ -147,11 +166,11 @@ void Application::exitPhysics() {
 
 	//delete collision configuration
 	delete m_collisionConfiguration;
-	
+
 }
 
 void Application::update() {	
-	
+
 	// Always draw the COM
 	if(!m_creature->m_showCOM)
 		m_creature->switchCOM();

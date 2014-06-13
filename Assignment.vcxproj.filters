@@ -23,6 +23,9 @@
     <ClInclude Include="src\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="destructulon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -35,6 +38,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="destructulon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
