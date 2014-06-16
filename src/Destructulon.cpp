@@ -20,18 +20,18 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	m_shapes[Destructulon::BODYPART_FOOT]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
 	m_shapes[Destructulon::BODYPART_LOWER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.50));
 	m_shapes[Destructulon::BODYPART_LOWER_LEG]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
-	m_shapes[Destructulon::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.40));
+	m_shapes[Destructulon::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.07), btScalar(0.40));
 	m_shapes[Destructulon::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
 	m_shapes[Destructulon::BODYPART_UPPER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
-	m_shapes[Destructulon::BODYPART_UPPER_ARM]->setColor(btVector3(0,0,0));
+	m_shapes[Destructulon::BODYPART_UPPER_ARM]->setColor(btVector3(1,1,1));
 	m_shapes[Destructulon::BODYPART_LOWER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
-	m_shapes[Destructulon::BODYPART_LOWER_ARM]->setColor(btVector3(0,0,0));
+	m_shapes[Destructulon::BODYPART_LOWER_ARM]->setColor(btVector3(1,1,1));
 	m_shapes[Destructulon::BODYPART_UPPER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.3));
-	m_shapes[Destructulon::BODYPART_UPPER_L_ARM]->setColor(btVector3(0,0,0));
+	m_shapes[Destructulon::BODYPART_UPPER_L_ARM]->setColor(btVector3(1,1,1));
 	m_shapes[Destructulon::BODYPART_LOWER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.3));
-	m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(0,0,0));
-	m_shapes[Destructulon::BODYPART_HEAD] = new btSphereShape(0.3);
-	m_shapes[Destructulon::BODYPART_HEAD]->setColor(btVector3(0.0,0.0,0.0));
+	m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(1,1,1));
+	/*m_shapes[Destructulon::BODYPART_HEAD] = new btSphereShape(0.3);
+	m_shapes[Destructulon::BODYPART_HEAD]->setColor(btVector3(0.0,0.0,0.0));*/
 
 #pragma endregion Setup the collision shapes
 	
@@ -45,7 +45,7 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	// FOOT
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
-	m_bodies[Destructulon::BODYPART_FOOT] = m_ownerWorld->localCreateRigidBody(btScalar(115.0), offset*transform, m_shapes[Destructulon::BODYPART_FOOT]);
+	m_bodies[Destructulon::BODYPART_FOOT] = m_ownerWorld->localCreateRigidBody(btScalar(5.0), offset*transform, m_shapes[Destructulon::BODYPART_FOOT]);
 
 	// LOWER_LEG
 	transform.setIdentity();
@@ -59,28 +59,30 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 
 	// UPPER_ARM
 	transform.setIdentity();
-	transform.setOrigin(btVector3(btScalar(-0.3), btScalar(0.8), btScalar(0.0)));
+	transform.setOrigin(btVector3(btScalar(-0.1), btScalar(0.8), btScalar(0.0)));
 	m_bodies[Destructulon::BODYPART_UPPER_ARM] = m_ownerWorld->localCreateRigidBody(btScalar(1.0), offset*transform, m_shapes[Destructulon::BODYPART_UPPER_ARM]);
 
 	// LOWER_ARM
 	transform.setIdentity();
-	transform.setOrigin(btVector3(btScalar(-0.3), btScalar(0.375), btScalar(0.0)));
+	transform.setOrigin(btVector3(btScalar(-0.1), btScalar(0.375), btScalar(0.0)));
 	m_bodies[Destructulon::BODYPART_LOWER_ARM] = m_ownerWorld->localCreateRigidBody(btScalar(1.0), offset*transform, m_shapes[Destructulon::BODYPART_LOWER_ARM]);
 
 	// UPPER_L_ARM
 	transform.setIdentity();
-	transform.setOrigin(btVector3(btScalar(0.3), btScalar(0.8), btScalar(0.0)));
+	transform.setOrigin(btVector3(btScalar(0.1), btScalar(0.8), btScalar(0.0)));
 	m_bodies[Destructulon::BODYPART_UPPER_L_ARM] = m_ownerWorld->localCreateRigidBody(btScalar(1.0), offset*transform, m_shapes[Destructulon::BODYPART_UPPER_L_ARM]);
 
 	// LOWER_L_ARM
 	transform.setIdentity();
-	transform.setOrigin(btVector3(btScalar(0.3), btScalar(0.375), btScalar(0.0)));
+	transform.setOrigin(btVector3(btScalar(0.1), btScalar(0.375), btScalar(0.0)));
 	m_bodies[Destructulon::BODYPART_LOWER_L_ARM] = m_ownerWorld->localCreateRigidBody(btScalar(1.0), offset*transform, m_shapes[Destructulon::BODYPART_LOWER_L_ARM]);
 
+	/*
 	// HEAD
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.8), btScalar(0.0)));
 	m_bodies[Destructulon::BODYPART_HEAD] = m_ownerWorld->localCreateRigidBody(btScalar(5.0), offset*transform, m_shapes[Destructulon::BODYPART_HEAD]);
+	*/
 
 #pragma endregion initialization of bodyparts
 
@@ -131,8 +133,13 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 	m_ownerWorld->addConstraint(m_joints[JOINT_KNEE], true);
 
+	//////
+	////// m_shapes[Destructulon::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.07), btScalar(0.40));
+	////// m_shapes[Destructulon::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
+	//////
+
 	// SHOULDER
-	socketJoint = new btPoint2PointConstraint(*m_bodies[Destructulon::BODYPART_HEAD], *m_bodies[Destructulon::BODYPART_UPPER_ARM], btVector3(-.25,0.0,0.0), btVector3(0.0,0.0,0.0));
+	socketJoint = new btPoint2PointConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_ARM], btVector3(-.06,0.09,0.0), btVector3(0.0,0.0,0.0));
 
 	m_joints[Destructulon::JOINT_SHOULDER] = socketJoint;
 	socketJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -152,7 +159,7 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	m_ownerWorld->addConstraint(m_joints[JOINT_ELBOW], true);
 
 	// SHOULDER_L
-	socketJoint = new btPoint2PointConstraint(*m_bodies[Destructulon::BODYPART_HEAD], *m_bodies[Destructulon::BODYPART_UPPER_L_ARM], btVector3(0.25,0.0,0.0), btVector3(0.0,0.0,0.0));
+	socketJoint = new btPoint2PointConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_L_ARM], btVector3(0.06,.09,0.0), btVector3(0.0,0.0,0.0));
 
 	m_joints[Destructulon::JOINT_L_SHOULDER] = socketJoint;
 	socketJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -171,12 +178,14 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 	m_ownerWorld->addConstraint(m_joints[JOINT_L_ELBOW], true);
 
+	/*
 	// NECK
 	socketJoint = new btPoint2PointConstraint(*m_bodies[Destructulon::BODYPART_HEAD], *m_bodies[Destructulon::BODYPART_UPPER_LEG], btVector3(0.0,0.0,0.0), btVector3(0.0,0.5,0.0));
 
 	m_joints[Destructulon::JOINT_NECK] = socketJoint;
 	socketJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 	m_ownerWorld->addConstraint(m_joints[JOINT_NECK], true);
+	*/
 
 #pragma endregion intialization of joints
 }

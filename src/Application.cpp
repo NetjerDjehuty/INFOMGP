@@ -15,7 +15,7 @@
 
 void Application::initPhysics() {
 
-	this->updateCreature = true;
+	this->creatureCreated = false;
 	// Setup the basic world
 	// =====================
 	setTexturing(true);
@@ -52,8 +52,19 @@ void Application::resetScene(const btVector3& startOffset) {
 
 	this->strtOffset = startOffset;
 
-	if (m_creature != NULL) delete m_creature;
-	m_creature = new Creature(m_dynamicsWorld, startOffset);
+	if(m_destructulon != NULL)
+	{
+		delete m_destructulon;
+		m_destructulon = new Destructulon(m_dynamicsWorld, startOffset);
+	}
+	if(m_creature != NULL)
+	{
+		delete m_creature;
+		m_creature = new Creature(m_dynamicsWorld, startOffset);
+	}
+
+
+
 	if (m_scene != NULL) delete m_scene;
 	m_scene = new Scene(m_dynamicsWorld);
 	m_startTime = GetTickCount();
@@ -98,27 +109,24 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 	// You can add your key bindings here.
 	// Be careful to not use a key already listed in DemoApplication::keyboardCallback
 	switch (key) {
-		/*case 'a': // move left arm for player 1
+	case 'a': // move left arm for player 1
 		{
-		if(m_creature->name == "Destructulon")
-		{
-		m_creature->m_bodies[m_creature->BODYPART_LOWER_L_ARM]->applyForce(btVector3(0,0,910), btVector3(0,1.5,0));
+			if(!this->creatureCreated)
+			{
+				if (m_creature != NULL) delete m_creature;
+				m_creature = new Creature(m_dynamicsWorld, this->strtOffset);
+				this->creatureCreated = true;
+			}
+			break;
 		}
-		break;
-		}*/
 	case 'd' : // Create destructulon and delete Creature
 		{
-			if(this->updateCreature)
-				this->updateCreature = false;
-
-
-			if (m_creature != NULL) 
+			if(!this->creatureCreated)
 			{
-				delete m_creature;
-				m_creature->~Creature();
+				if (m_destructulon != NULL) delete m_destructulon;
+				m_destructulon = new Destructulon(m_dynamicsWorld, this->strtOffset);
+				this->creatureCreated = true;
 			}
-			m_creature = (Creature *)new Destructulon(m_dynamicsWorld, this->strtOffset);
-			this->updateCreature = true;
 			break;
 		}
 	case 'e':
@@ -179,20 +187,41 @@ void Application::exitPhysics() {
 }
 
 void Application::update() {	
-	// Always draw the COM
-	if(!m_creature->m_showCOM)
-		m_creature->switchCOM();
 
-	// Do not update time if creature fallen
-	if (!m_creature->hasFallen()) m_currentTime = GetTickCount();
-	m_elapsedTime = (int)(((double) m_currentTime - m_startTime)/100.0);
+	if(m_creature != NULL)
+	{
+		// Always draw the COM
+		if(!m_creature->m_showCOM)
+			m_creature->switchCOM();
 
-	// Move the platform if not fallen
-	m_scene->update( (!m_creature->hasFallen()) ? m_elapsedTime : -1, m_creature->getCOM());
+		// Do not update time if creature fallen
+		if (!m_creature->hasFallen()) m_currentTime = GetTickCount();
+		m_elapsedTime = (int)(((double) m_currentTime - m_startTime)/100.0);
 
-	// Control the creature movements
-	if(this->updateCreature)
+		// Move the platform if not fallen
+		m_scene->update( (!m_creature->hasFallen()) ? m_elapsedTime : -1, m_creature->getCOM());
+
+		// Control the creature movements
 		m_creature->update((int)(m_currentTime - m_startTime));
+	}
+
+	if(m_destructulon != NULL)
+	{
+		// Always draw the COM
+		if(!m_destructulon->m_showCOM)
+			m_destructulon->switchCOM();
+
+		// Do not update time if creature fallen
+		if (!m_destructulon->hasFallen()) m_currentTime = GetTickCount();
+		m_elapsedTime = (int)(((double) m_currentTime - m_startTime)/100.0);
+
+		// Move the platform if not fallen
+		m_scene->update( (!m_destructulon->hasFallen()) ? m_elapsedTime : -1, m_destructulon->getCOM());
+
+		// Control the creature movements
+		m_destructulon->update((int)(m_currentTime - m_startTime));
+	}
+
 	// Display info
 	DemoApplication::displayProfileString(10,20,"Q=quit E=reset R=platform T=ball Y=COM U=switch I=pause");
 

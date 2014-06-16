@@ -5,7 +5,7 @@
 #include "Creature.h"
 #include "btBulletDynamicsCommon.h"
 
-class Destructulon : private Creature
+class Destructulon
 {
 public:
 	Destructulon (btDynamicsWorld* ownerWorld, const btVector3& positionOffset); // Constructor
@@ -22,9 +22,9 @@ public:
 
 public:
 
-	enum {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG, BODYPART_UPPER_ARM, BODYPART_LOWER_ARM, BODYPART_UPPER_L_ARM, BODYPART_LOWER_L_ARM, BODYPART_HEAD, BODYPART_COUNT}; // Body parts of the creature
+	enum {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG, BODYPART_UPPER_ARM, BODYPART_LOWER_ARM, BODYPART_UPPER_L_ARM, BODYPART_LOWER_L_ARM, /*BODYPART_HEAD,*/ BODYPART_COUNT}; // Body parts of the creature
 
-	enum {JOINT_ANKLE,JOINT_KNEE, JOINT_SHOULDER, JOINT_ELBOW, JOINT_L_SHOULDER, JOINT_L_ELBOW, JOINT_NECK, JOINT_COUNT}; // Joints of the creature
+	enum {JOINT_ANKLE,JOINT_KNEE, JOINT_SHOULDER, JOINT_ELBOW, JOINT_L_SHOULDER, JOINT_L_ELBOW, /*JOINT_NECK,*/ JOINT_COUNT}; // Joints of the creature
 
 	btDynamicsWorld		*	m_ownerWorld;				// The physics world of the simulation
 	btCollisionShape	*	m_shapes[BODYPART_COUNT];	// The primitive shape of each body part used in collision
