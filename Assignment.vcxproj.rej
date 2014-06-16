@@ -1,0 +1,16 @@
+diff a/Assignment.vcxproj b/Assignment.vcxproj	(rejected hunks)
+@@ -101,12 +101,14 @@
+     </ResourceCompile>
+   </ItemDefinitionGroup>
+   <ItemGroup>
++    <ClInclude Include="destructulon.h" />
+     <ClInclude Include="resource.h" />
+     <ClInclude Include="src\Application.h" />
+     <ClInclude Include="src\Creature.h" />
+     <ClInclude Include="src\Scene.h" />
+   </ItemGroup>
+   <ItemGroup>
++    <ClCompile Include="destructulon.cpp" />
+     <ClCompile Include="src\Application.cpp" />
+     <ClCompile Include="src\Creature.cpp" />
+     <ClCompile Include="src\main.cpp" />

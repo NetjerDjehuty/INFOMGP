@@ -15,6 +15,7 @@
 
 void Application::initPhysics() {
 
+	this->updateCreature = true;
 	// Setup the basic world
 	// =====================
 	setTexturing(true);
@@ -48,10 +49,11 @@ void Application::initPhysics() {
 }
 
 void Application::resetScene(const btVector3& startOffset) {
+
+	this->strtOffset = startOffset;
+
 	if (m_creature != NULL) delete m_creature;
 	m_creature = new Creature(m_dynamicsWorld, startOffset);
-/*	if (m_destructulon != NULL) delete m_destructulon;
-	m_destructulon = new Destructulon(m_dynamicsWorld, startOffset);*/
 	if (m_scene != NULL) delete m_scene;
 	m_scene = new Scene(m_dynamicsWorld);
 	m_startTime = GetTickCount();
@@ -96,22 +98,29 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 	// You can add your key bindings here.
 	// Be careful to not use a key already listed in DemoApplication::keyboardCallback
 	switch (key) {
-	/*case 'a': // move left arm for player 1
+		/*case 'a': // move left arm for player 1
 		{
-			if(m_creature->name == "Destructulon")
+		if(m_creature->name == "Destructulon")
+		{
+		m_creature->m_bodies[m_creature->BODYPART_LOWER_L_ARM]->applyForce(btVector3(0,0,910), btVector3(0,1.5,0));
+		}
+		break;
+		}*/
+	case 'd' : // Create destructulon and delete Creature
+		{
+			if(this->updateCreature)
+				this->updateCreature = false;
+
+
+			if (m_creature != NULL) 
 			{
-				m_creature->m_bodies[m_creature->BODYPART_LOWER_L_ARM]->applyForce(btVector3(0,0,910), btVector3(0,1.5,0));
+				delete m_creature;
+				m_creature->~Creature();
 			}
+			m_creature = (Creature *)new Destructulon(m_dynamicsWorld, this->strtOffset);
+			this->updateCreature = true;
 			break;
 		}
-	case 'd': // move right arm for player 1
-		{
-			if(m_creature->name == "Destructulon")
-			{
-				m_creature->m_bodies[m_creature->BODYPART_LOWER_ARM]->applyForce(btVector3(0,0,910), btVector3(0,1.5,0));
-			}
-			break;
-		}*/
 	case 'e':
 		{
 			btVector3 startOffset(0,0.55,0);
@@ -170,7 +179,6 @@ void Application::exitPhysics() {
 }
 
 void Application::update() {	
-
 	// Always draw the COM
 	if(!m_creature->m_showCOM)
 		m_creature->switchCOM();
@@ -183,8 +191,8 @@ void Application::update() {
 	m_scene->update( (!m_creature->hasFallen()) ? m_elapsedTime : -1, m_creature->getCOM());
 
 	// Control the creature movements
-	m_creature->update((int)(m_currentTime - m_startTime));
-
+	if(this->updateCreature)
+		m_creature->update((int)(m_currentTime - m_startTime));
 	// Display info
 	DemoApplication::displayProfileString(10,20,"Q=quit E=reset R=platform T=ball Y=COM U=switch I=pause");
 
@@ -198,5 +206,4 @@ void Application::update() {
 	else
 		oss << "Time under balance: " << s_elapsedTime.substr(0,s_elapsedTime.size()-1) << "." << s_elapsedTime.substr(s_elapsedTime.size()-1,s_elapsedTime.size()) << " seconds";
 	DemoApplication::displayProfileString(10,40,const_cast<char*>(oss.str().c_str()));	
-
 }

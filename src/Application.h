@@ -4,6 +4,7 @@
 
 //------------- include/declaration -------------
 #include "GlutDemoApplication.h"
+#include "Destructulon.h"
 class btBroadphaseInterface;
 class btCollisionShape;
 class btCollisionDispatcher;
@@ -22,6 +23,8 @@ public:
 	Application() : m_creature(NULL), m_scene(NULL), m_elapsedTime(0) {}
 	virtual ~Application() {	exitPhysics(); } // Destructor
 
+	bool updateCreature;
+	btVector3 strtOffset;			// Start offset 
 	void initPhysics();				// Initialize the simulation
 	void exitPhysics();				// End the simulation
 
@@ -35,6 +38,7 @@ protected:
 	void resetScene(const btVector3& startOffset);	// Reset the creature
 	void update();									// Update objects and display the time elapsed under balance
 
+	Destructulon					*	m_destructulon;	// Destructulon
 	Creature						*	m_creature;		// The creature
 	Scene							*	m_scene;		// The scene
 	btCollisionShape				*	m_ground;		// The ground
