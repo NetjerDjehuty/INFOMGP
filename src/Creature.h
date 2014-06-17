@@ -1,4 +1,3 @@
-
 #ifndef CREATURE_H
 #define CREATURE_H
 
@@ -22,9 +21,9 @@ public:
 
 public:
 
-	enum {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG,BODYPART_COUNT}; // Body parts of the creature
+	enum Part {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG,BODYPART_COUNT}; // Body parts of the creature
 
-	enum {JOINT_ANKLE,JOINT_KNEE,JOINT_COUNT}; // Joints of the creature
+	enum Joint {JOINT_ANKLE,JOINT_KNEE,JOINT_COUNT}; // Joints of the creature
 
 	btDynamicsWorld		*	m_ownerWorld;				// The physics world of the simulation
 	btCollisionShape	*	m_shapes[BODYPART_COUNT];	// The primitive shape of each body part used in collision
@@ -38,7 +37,11 @@ public:
 	btCollisionShape	*	m_COMShape;		// Shape for COM
 	btRigidBody			*	m_COM;			// Body COM
 	btVector3				m_positionCOM;	// Position COM
-	btVector3 computeCenterOfMass();		// Compute the COM of the creature in world coordinate system
+	btVector3				computeCenterOfMass(Part from = (Part)0);		// Compute the COM of the creature in world coordinate system from the given part up
+	float					computeTotalMass(Part from = (Part)0);		// Compute the mass of the creature in world coordinate system from the given part up
+
+	btVector3				computeCenterOfMassBelow(Part to);		// Compute the COM of the creature in world coordinate system from the given part up
+	float					computeTotalMassBelow(Part to);		// Compute the mass of the creature in world coordinate system from the given part up
 
 };
 

@@ -122,6 +122,7 @@ void Creature::switchCOM() {
 		btTransform transform;
 		transform.setIdentity();
 		transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
+
 		m_COM = m_ownerWorld->localCreateRigidBody(btScalar(0.0), transform, m_COMShape);
 		m_COM->setCollisionFlags(m_COM->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 		m_COM->setActivationState(DISABLE_DEACTIVATION);
@@ -132,6 +133,23 @@ void Creature::switchCOM() {
 		delete m_COM; m_COM = NULL;
 		delete m_COMShape; m_COMShape = NULL;	
 	}	
+}
+
+btTransform groundProjFromObject(btCollisionObject* obj)
+{
+	btTransform trObj = obj->getWorldTransform();
+	btVector3 translate = trObj.getOrigin();
+	btQuaternion fRot = trObj.getRotation();
+
+	btScalar yaw = atan2(	2*(fRot.y()*fRot.w()) - 2*(fRot.x()*fRot.z()),
+							1.0 - 2*(fRot.y()*fRot.y()) - 2*(fRot.z()*fRot.z())); // Apparently it's this? I should really learn quaternions one of these days...
+
+	btTransform ret; ret.setIdentity();
+	ret.setOrigin(translate);
+	ret.setRotation(btQuaternion(btVector3(0.0, 1.0, 0.0), yaw));
+	ret = ret.inverse();
+
+	return ret;
 }
 
 void Creature::update(int elapsedTime) {
@@ -164,24 +182,40 @@ void Creature::update(int elapsedTime) {
 	if (elapsedTime - lastChange > 10) { // Update balance control only every 10 ms
 		lastChange = elapsedTime;
 
-		btVector3 COM, COA;
-		COA = m_bodies[BODYPART_FOOT]->getCenterOfMassPosition();
+		btVector3 comFoot = m_bodies[BODYPART_FOOT]->getCenterOfMassPosition();
+
+		/*
+		btVector3 COM;
 		COM = computeCenterOfMass();
 
-		btTransform trFoot = m_bodies[Creature::BODYPART_FOOT]->getWorldTransform();
-		btQuaternion fRot = trFoot.getRotation();
-		btScalar mag = sqrt(fRot.w()*fRot.w() + fRot.y()*fRot.y());
-		btScalar yaw = 2*acos(fRot.w()/mag); //... I think...
+		COM = groundProjFromObject(m_bodies[Creature::BODYPART_FOOT]) * COM;
+		*/
 
-		btTransform yawRot; yawRot.setIdentity();
-		yawRot.setRotation(btQuaternion(yaw,0,0));
-		yawRot = yawRot.inverse();
+		for (int i = 0; i < Creature::JOINT_COUNT; i++)
+		{
+			btHingeConstraint* currentJoint = ((btHingeConstraint*)m_joints[i]);
+			btCollisionObject* bodyPart = m_bodies[i];
 
-		COM = yawRot * COM;
-		COA = yawRot * COA;
+			btTransform bodySpace = groundProjFromObject(bodyPart);
 
-		((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() - COA.z() ) * 20.0f );
-		((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->setMotorTarget( btScalar( COA.x() - COM.x() ) * 25.0f );
+			btVector3 csp = bodySpace * comFoot;
+			btVector3 comTotal = bodySpace * computeCenterOfMass();
+
+			btVector3 error = comTotal - csp;
+
+			btTransform lowerJointSpace = currentJoint->getAFrame();
+			btVector3 comAbove = lowerJointSpace * computeCenterOfMass((Part)i);
+			float massAbove = computeTotalMass((Part)i);
+
+			btVector3 comBelow = lowerJointSpace * computeCenterOfMassBelow((Part)i);
+			float massBelow = computeTotalMassBelow((Part)i);
+
+			currentJoint->setMotorTarget( (i%2?-error.x():error.z())  * 30.0f * (computeTotalMass() / massAbove) );
+		}
+		
+
+		//((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() ) * 20.0f );
+		//((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->setMotorTarget( btScalar(- COM.x() ) * 25.0f );
 
 		//=================== TODO ===================//
 
@@ -221,19 +255,54 @@ bool Creature::hasFallen() {
 	return m_hasFallen;
 }
 
-btVector3 Creature::computeCenterOfMass() {
+btVector3 Creature::computeCenterOfMass(Part from) {
 
 	btVector3 ret(0,0,0);
-	float totMass = 0.0f;
 
-	for (int i = 0; i < BODYPART_COUNT; i++)
+	for (int i = from; i < BODYPART_COUNT; i++)
 	{
-		totMass += (1.0f/m_bodies[i]->getInvMass());
 		ret +=	m_bodies[i]->getCenterOfMassPosition() / m_bodies[i]->getInvMass();
 	}
 
-	//=================== TODO ==================//
-	return ret/totMass;
-	//===========================================//
+	return ret/computeTotalMass(from);
+}
 
+float Creature::computeTotalMass(Part from) {
+
+	float totMass = 0.0f;
+
+	for (int i = from; i < BODYPART_COUNT; i++)
+	{
+		totMass += (1.0f/m_bodies[i]->getInvMass());
+	}
+
+	return totMass;
+}
+
+
+btVector3 Creature::computeCenterOfMassBelow(Part to) {
+
+	if (to == 0)
+		return btVector3(0,0,0);
+
+	btVector3 ret(0,0,0);
+
+	for (int i = 0; i < to; i++)
+	{
+		ret +=	m_bodies[i]->getCenterOfMassPosition() / m_bodies[i]->getInvMass();
+	}
+
+	return ret/computeTotalMassBelow(to);
+}
+
+float Creature::computeTotalMassBelow(Part to) {
+
+	float totMass = 0.0f;
+
+	for (int i = 0; i < to; i++)
+	{
+		totMass += (1.0f/m_bodies[i]->getInvMass());
+	}
+
+	return totMass;
 }

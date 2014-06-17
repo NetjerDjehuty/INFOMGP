@@ -20,7 +20,7 @@ class Application : public GlutDemoApplication {
 
 public:
 
-	Application() : m_creature(NULL), m_scene(NULL), m_elapsedTime(0) {}
+	Application() : m_creature(NULL), m_destructulon(NULL), m_scene(NULL), m_elapsedTime(0) {}
 	virtual ~Application() {	exitPhysics(); } // Destructor
 
 	bool creatureCreated;

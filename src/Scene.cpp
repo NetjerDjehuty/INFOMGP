@@ -77,7 +77,10 @@ void Scene::update(int elapsedTime, const btVector3& creatureCOM) {
 
 		// Apply rotation
 		btQuaternion appliedRotation (btVector3( btScalar((m_axisToRotatePlatform==0) ? 1 : 0) , btScalar((m_axisToRotatePlatform==1) ? 1 : 0) , btScalar((m_axisToRotatePlatform==2) ? 1 : 0 )), m_magnitudeToRotatePlatform * btScalar(((m_signToRotatePlatform==0) ? 1 : -1) ));
+		//appliedRotation *= btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0.0001f);
+		//btQuaternion appliedRotation = btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0.0001f);
 		currentRotation *= appliedRotation;
+
 		if (abs(currentRotation.getAngle()) < 0.25) {
 			transform.setRotation(currentRotation);
 			m_platform->getMotionState()->setWorldTransform(transform);
