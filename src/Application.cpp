@@ -150,6 +150,11 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 			m_creature->switchCOM();
 			break;
 		}
+	case 'c':
+		{
+			m_scene->shootCannon();
+			break;
+		}
 	default :
 		DemoApplication::keyboardCallback(key, x, y);
 	}	
