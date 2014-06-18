@@ -141,8 +141,8 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 
 	// SHOULDER
 	localA.setIdentity(); localB.setIdentity();
-	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(-0.1), btScalar(0.1), btScalar(0.0)));
-	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
+	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(-0.1), btScalar(.15), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.1), btScalar(0.0)));
 	//old stuff: socketJoint = new btPoint2PointConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_ARM], btVector3(-.06,0.09,0.0), btVector3(0.0,0.0,0.0));
 	socketJoint = new btConeTwistConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_ARM], localA, localB);
 
@@ -169,8 +169,8 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 
 	// SHOULDER_L
 	localA.setIdentity(); localB.setIdentity();
-	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.1), btScalar(0.1), btScalar(0.0)));
-	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
+	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.1), btScalar(.15), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.1), btScalar(0.0)));
 	socketJoint = new btConeTwistConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_L_ARM], localA, localB);
 	//old stuff: socketJoint = new btPoint2PointConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_L_ARM], btVector3(0.06,.09,0.0), btVector3(0.0,0.0,0.0));
 
