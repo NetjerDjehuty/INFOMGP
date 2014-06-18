@@ -41,6 +41,10 @@ void Application::initPhysics() {
 
 	// Init Scene
 	// ==========
+
+	m_destructulon = NULL;
+	m_creature = NULL;
+
 	btVector3 startOffset(0,0.55,0);
 	resetScene(startOffset);
 	clientResetScene();
@@ -55,12 +59,16 @@ void Application::resetScene(const btVector3& startOffset) {
 	if(m_destructulon != NULL)
 	{
 		delete m_destructulon;
-		m_destructulon = new Destructulon(m_dynamicsWorld, startOffset);
+		m_destructulon = NULL;
+		if(m_destructulon == NULL)
+			m_destructulon = new Destructulon(m_dynamicsWorld, startOffset);
 	}
 	if(m_creature != NULL)
 	{
 		delete m_creature;
-		m_creature = new Creature(m_dynamicsWorld, startOffset);
+		m_creature = NULL;
+		if(m_creature == NULL)
+			m_creature = new Creature(m_dynamicsWorld, startOffset);
 	}
 
 
@@ -111,22 +119,34 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 	switch (key) {
 	case 'a': // move left arm for player 1
 		{
-			if(!this->creatureCreated)
+			if (m_creature != NULL)
 			{
-				if (m_creature != NULL) delete m_creature;
-				m_creature = new Creature(m_dynamicsWorld, this->strtOffset);
-				this->creatureCreated = true;
+				delete m_creature;
+				m_creature = NULL;
 			}
+			if(m_destructulon != NULL)
+			{
+				delete m_destructulon;
+				m_destructulon = NULL;
+			}
+			m_creature = new Creature(m_dynamicsWorld, this->strtOffset);
+			Application::resetScene(this->strtOffset);
 			break;
 		}
 	case 'd' : // Create destructulon and delete Creature
 		{
-			if(!this->creatureCreated)
+			if (m_destructulon != NULL)
 			{
-				if (m_destructulon != NULL) delete m_destructulon;
-				m_destructulon = new Destructulon(m_dynamicsWorld, this->strtOffset);
-				this->creatureCreated = true;
+				delete m_destructulon;
+				m_destructulon = NULL;
 			}
+			if (m_creature != NULL)
+			{
+				delete m_creature;
+				m_creature = NULL;
+			}
+			m_destructulon = new Destructulon(m_dynamicsWorld, this->strtOffset);
+			Application::resetScene(this->strtOffset);
 			break;
 		}
 	case 'e':
@@ -148,6 +168,11 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 	case 'y':
 		{
 			m_creature->switchCOM();
+			break;
+		}
+	case 'c':
+		{
+			m_scene->shootCannon();
 			break;
 		}
 	default :
@@ -187,7 +212,6 @@ void Application::exitPhysics() {
 }
 
 void Application::update() {	
-
 	if(m_creature != NULL)
 	{
 		// Always draw the COM
@@ -207,6 +231,9 @@ void Application::update() {
 
 	if(m_destructulon != NULL)
 	{
+		if(m_scene->m_ball != NULL)
+			m_destructulon->m_ball = m_scene->m_ball;
+
 		// Always draw the COM
 		if(!m_destructulon->m_showCOM)
 			m_destructulon->switchCOM();
