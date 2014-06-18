@@ -135,21 +135,14 @@ void Creature::switchCOM() {
 	}	
 }
 
-btTransform groundProjFromObject(btCollisionObject* obj)
+float yawFromObject(btCollisionObject* obj)
 {
 	btTransform trObj = obj->getWorldTransform();
 	btVector3 translate = trObj.getOrigin();
 	btQuaternion fRot = trObj.getRotation();
 
-	btScalar yaw = atan2(	2*(fRot.y()*fRot.w()) - 2*(fRot.x()*fRot.z()),
-							1.0 - 2*(fRot.y()*fRot.y()) - 2*(fRot.z()*fRot.z())); // Apparently it's this? I should really learn quaternions one of these days...
-
-	btTransform ret; ret.setIdentity();
-	ret.setOrigin(translate);
-	ret.setRotation(btQuaternion(btVector3(0.0, 1.0, 0.0), yaw));
-	ret = ret.inverse();
-
-	return ret;
+	return atan2(	2*(fRot.y()*fRot.w()) - 2*(fRot.x()*fRot.z()),
+					1.0 - 2*(fRot.y()*fRot.y()) - 2*(fRot.z()*fRot.z())); // Apparently it's this? I should really learn quaternions one of these days...
 }
 
 void Creature::update(int elapsedTime) {
@@ -191,28 +184,34 @@ void Creature::update(int elapsedTime) {
 		COM = groundProjFromObject(m_bodies[Creature::BODYPART_FOOT]) * COM;
 		*/
 
+		
 		for (int i = 0; i < Creature::JOINT_COUNT; i++)
 		{
 			btHingeConstraint* currentJoint = ((btHingeConstraint*)m_joints[i]);
 			btCollisionObject* bodyPart = m_bodies[i];
+			btTransform bodySpace = bodyPart->getWorldTransform().inverse();
+			//btTransform jointSpace = currentJoint->getRigidBodyA().getWorldTransform().inverse();
 
-			btTransform bodySpace = groundProjFromObject(bodyPart);
-
-			btVector3 csp = bodySpace * comFoot;
 			btVector3 comTotal = bodySpace * computeCenterOfMass();
+			btVector3 comGrav = (bodySpace * (computeCenterOfMass() + btVector3(0,-1,0))) - comTotal;
+			btVector3 csp = (bodySpace * comFoot) - comTotal;
 
-			btVector3 error = comTotal - csp;
+			btTransform relJoint = currentJoint->getAFrame();
+			btVector3 errorAxis = relJoint * btVector3(0,0,1);
 
+			btScalar error = (csp - (csp.dot(comGrav) * comGrav)).dot(errorAxis);
+
+			/*
 			btTransform lowerJointSpace = currentJoint->getAFrame();
-			btVector3 comAbove = lowerJointSpace * computeCenterOfMass((Part)i);
+			btVector3 comAbove = lowerJointSpace * computeCenterOfMass((Part)i);*/
 			float massAbove = computeTotalMass((Part)i);
-
+			/*
 			btVector3 comBelow = lowerJointSpace * computeCenterOfMassBelow((Part)i);
 			float massBelow = computeTotalMassBelow((Part)i);
+			*/
 
-			currentJoint->setMotorTarget( (i%2?-error.x():error.z())  * 30.0f * (computeTotalMass() / massAbove) );
+			currentJoint->setMotorTarget( error * 20.0f );
 		}
-		
 
 		//((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() ) * 20.0f );
 		//((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->setMotorTarget( btScalar(- COM.x() ) * 25.0f );
