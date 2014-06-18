@@ -19,3 +19,8 @@ Temporary Files\*
 *.ilk
 *.opensdf
 *.res
+src/Scene.h.BACKUP.6828.h
+src/Scene.h.BASE.6828.h
+src/Scene.h.LOCAL.6828.h
+src/Scene.h.REMOTE.6828.h
+src/Scene.h.orig
