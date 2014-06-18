@@ -207,7 +207,6 @@ void Application::exitPhysics() {
 }
 
 void Application::update() {	
-
 	if(m_creature != NULL)
 	{
 		// Always draw the COM
@@ -227,6 +226,9 @@ void Application::update() {
 
 	if(m_destructulon != NULL)
 	{
+		if(m_scene->m_ball != NULL)
+			m_destructulon->m_ball = m_scene->m_ball;
+
 		// Always draw the COM
 		if(!m_destructulon->m_showCOM)
 			m_destructulon->switchCOM();

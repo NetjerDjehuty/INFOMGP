@@ -16,6 +16,7 @@ public:
 	void switchCOM();					// Activate / Deactivate the visualization of the COM
 	bool m_showCOM;						// Show COM
 	const char* name;					// Name of the player
+	btRigidBody*	m_ball;				// Ball
 
 	btVector3 getCOM() {return m_positionCOM;}	// Return the position of the COM
 
