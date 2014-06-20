@@ -315,40 +315,63 @@ void Destructulon::update(int elapsedTime) {
 			firstLoop = false;
 		}
 
-		// FIRST TRY AT PUSHING THE OPPONENT
+#pragma region
 		if(this->opponent != NULL)
 		{
-			btVector3 pushTowards = this->opponent->m_bodies[BODYPART_UPPER_LEG]->getCenterOfMassPosition();
-			btVector3 arm = m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition();
-			btVector3 temp = btCross(arm, pushTowards);
-			btScalar w = sqrt((pushTowards.length() * pushTowards.length()) * (arm.length() * arm.length())) + btDot(arm, pushTowards);
+			btVector3 opponentPos = this->opponent->m_bodies[BODYPART_UPPER_LEG]->getCenterOfMassPosition();
+			btVector3 arm = this->m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition();
+			btVector3 up = btVector3(0, 0.3, 0);
+			btTransform armOrient = m_bodies[BODYPART_UPPER_ARM]->getWorldTransform();
+			btVector3 shoulder = armOrient * up;
 
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(btQuaternion(btScalar(temp.getX()), btScalar(temp.getY()), btScalar(temp.getZ()), w));
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(btQuaternion(btScalar(temp.getX()), btScalar(temp.getY()), btScalar(temp.getZ()), w));
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+			btVector3 shoulderToOpponent = shoulder - opponentPos;
+			btVector3 shoulderToArm = shoulder - arm;
+
+			btVector3 temp = btCross(shoulderToOpponent,shoulderToArm);
+
+			btScalar w = sqrt((shoulderToOpponent.length() * shoulderToOpponent.length()) * (shoulderToArm.length() * shoulderToArm.length())) + btDot(shoulderToArm, shoulderToOpponent);
+
+
+			btQuaternion Quat = btQuaternion(temp.getX(), temp.getY(), temp.getZ(), w);
+
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat.normalize());
+			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat.normalize());
+			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
 		}
+#pragma endregion  BATTLE!
 
-
-		// BALL SLAPPER
+#pragma region
 		if(this->m_ball != NULL)
 		{
-			btVector3 slapTowards = this->m_ball->getCenterOfMassPosition();
+			btVector3 ballPos = this->m_ball->getCenterOfMassPosition();
 			btScalar threshold = 3;
-			if(slapTowards.distance2(m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition()) < threshold)
+			if(ballPos.distance2(m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition()) < threshold)
 			{
-				btVector3 arm = m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition();
-				btVector3 temp = btCross(arm, slapTowards);
-				btScalar w = sqrt((slapTowards.length() * slapTowards.length()) * (arm.length() * arm.length())) + btDot(arm, slapTowards);
+				btVector3 ballPos = this->m_ball->getCenterOfMassPosition();
+				btVector3 arm = this->m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition();
+				btVector3 up = btVector3(0, 0.3, 0);
+				btTransform armOrient = m_bodies[BODYPART_UPPER_ARM]->getWorldTransform();
+				btVector3 shoulder = armOrient * up;
 
-				if(temp.getZ() > -0.1)
+				btVector3 shoulderToBall = shoulder - ballPos;
+				btVector3 shoulderToArm = shoulder - arm;
+
+				btVector3 temp = btCross(shoulderToBall, shoulderToArm);
+
+				btScalar w = sqrt((shoulderToBall.length() * shoulderToBall.length()) * (shoulderToArm.length() * shoulderToArm.length())) + btDot(shoulderToBall,shoulderToArm);
+
+
+				btQuaternion Quat = btQuaternion(temp.getX(), temp.getY(), temp.getZ(), w);
+
+				if(temp.getZ() > -.1)
 				{
-					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(btQuaternion(btScalar(temp.getX()), btScalar(temp.getY()), btScalar(temp.getZ()), w));
+					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat.normalize());
 					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
 				}
 				else if(temp.getZ() < 0.1)
 				{
-					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(btQuaternion(btScalar(temp.getX()), btScalar(temp.getY()), btScalar(temp.getZ()), w));
+					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat.normalize());
 					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
 				}
 			}
@@ -358,6 +381,7 @@ void Destructulon::update(int elapsedTime) {
 				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget( btQuaternion( btScalar(0.0) ,  btScalar( COM.z() - COA.z() ) * 10.0f ,  btScalar( COM.x() - COA.x() ) * 15.0f ));
 			}
 		}
+#pragma endregion BALL SLAPPER
 
 		//=================== TODO ===================//
 

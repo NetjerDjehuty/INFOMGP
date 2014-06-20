@@ -66,10 +66,16 @@ void Application::resetScene(const btVector3& startOffset) {
 	}
 	if(m_destructulon2 != NULL)
 	{
+		delete m_destructulon;
+		m_destructulon = NULL;
+		if(m_destructulon == NULL)
+			m_destructulon = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, 0.25));
+
 		delete m_destructulon2;
 		m_destructulon2 = NULL;
 		if(m_destructulon2 == NULL)
-			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -.5));
+			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -0.25));
+
 		if(m_destructulon != NULL)
 			m_destructulon2->opponent = m_destructulon;
 		if(m_destructulon2 != NULL)
@@ -198,8 +204,8 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 				delete m_creature;
 				m_creature = NULL;
 			}
-			m_destructulon = new Destructulon(m_dynamicsWorld, this->strtOffset);
-			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -.5));
+			m_destructulon = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, 0.25));
+			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -0.25));
 			m_destructulon->opponent = m_destructulon2;
 			m_destructulon2->opponent = m_destructulon;
 			//Application::resetScene(this->strtOffset);
