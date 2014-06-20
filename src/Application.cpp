@@ -167,7 +167,10 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 		}
 	case 'y':
 		{
-			m_creature->switchCOM();
+			if(m_creature != NULL)
+				m_creature->switchCOM();
+			else if (m_destructulon != NULL)
+				m_destructulon->switchCOM();
 			break;
 		}
 	case 'c':
