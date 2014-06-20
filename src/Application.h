@@ -38,7 +38,8 @@ protected:
 	void resetScene(const btVector3& startOffset);	// Reset the creature
 	void update();									// Update objects and display the time elapsed under balance
 
-	Destructulon					*	m_destructulon;	// The Destructulon
+	Destructulon					*	m_destructulon;	// The first Destructulon
+	Destructulon					*	m_destructulon2;// The Second Destructulon
 	Creature						*	m_creature;		// The creature
 	Scene							*	m_scene;		// The scene
 	btCollisionShape				*	m_ground;		// The ground

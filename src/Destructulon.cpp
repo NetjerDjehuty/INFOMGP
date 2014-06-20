@@ -13,6 +13,7 @@
 Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positionOffset) : m_ownerWorld (ownerWorld), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true)
 {
 	this->m_ball = NULL;
+	this->opponent = NULL;
 	name = "Destructulon";
 
 #pragma region
@@ -313,6 +314,21 @@ void Destructulon::update(int elapsedTime) {
 			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget( btQuaternion( btScalar(0.0) ,  btScalar( COM.z() - COA.z() ) * 10.0f ,  btScalar( COM.x() - COA.x() ) * 15.0f ));
 			firstLoop = false;
 		}
+
+		// FIRST TRY AT PUSHING THE OPPONENT
+		if(this->opponent != NULL)
+		{
+			btVector3 pushTowards = this->opponent->m_bodies[BODYPART_UPPER_LEG]->getCenterOfMassPosition();
+			btVector3 arm = m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition();
+			btVector3 temp = btCross(arm, pushTowards);
+			btScalar w = sqrt((pushTowards.length() * pushTowards.length()) * (arm.length() * arm.length())) + btDot(arm, pushTowards);
+
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(btQuaternion(btScalar(temp.getX()), btScalar(temp.getY()), btScalar(temp.getZ()), w));
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(btQuaternion(btScalar(temp.getX()), btScalar(temp.getY()), btScalar(temp.getZ()), w));
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+		}
+
 
 		// BALL SLAPPER
 		if(this->m_ball != NULL)

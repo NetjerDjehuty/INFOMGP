@@ -19,6 +19,7 @@ public:
 	const char* name;					// player name
 	bool firstLoop;						// To start with arms facing downwards
 	btRigidBody*	m_ball;				// Ball
+	Destructulon*	opponent;			// Ball
 
 	btVector3 getCOM() {return m_positionCOM;}	// Return the position of the COM
 

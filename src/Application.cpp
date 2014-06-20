@@ -44,6 +44,7 @@ void Application::initPhysics() {
 
 	m_destructulon = NULL;
 	m_creature = NULL;
+	m_destructulon2 = NULL;
 
 	btVector3 startOffset(0,0.55,0);
 	resetScene(startOffset);
@@ -62,6 +63,17 @@ void Application::resetScene(const btVector3& startOffset) {
 		m_destructulon = NULL;
 		if(m_destructulon == NULL)
 			m_destructulon = new Destructulon(m_dynamicsWorld, startOffset);
+	}
+	if(m_destructulon2 != NULL)
+	{
+		delete m_destructulon2;
+		m_destructulon2 = NULL;
+		if(m_destructulon2 == NULL)
+			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -.5));
+		if(m_destructulon != NULL)
+			m_destructulon2->opponent = m_destructulon;
+		if(m_destructulon2 != NULL)
+			m_destructulon->opponent = m_destructulon2;
 	}
 	if(m_creature != NULL)
 	{
@@ -122,11 +134,26 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 			if (m_creature != NULL)
 			{
 				delete m_creature;
+				if(m_destructulon != NULL)
+					if(m_destructulon->opponent != NULL)
+						m_destructulon->opponent = NULL;
+				if(m_destructulon2 != NULL)
+					if(m_destructulon2->opponent != NULL)
+						m_destructulon2->opponent = NULL;
 				m_creature = NULL;
+			}
+			if (m_destructulon2 != NULL)
+			{
+				delete m_destructulon2;
+				if(m_destructulon2->opponent != NULL)
+					m_destructulon2->opponent = NULL;
+				m_destructulon2 = NULL;
 			}
 			if(m_destructulon != NULL)
 			{
 				delete m_destructulon;
+				if(m_destructulon->opponent != NULL)
+					m_destructulon->opponent = NULL;
 				m_destructulon = NULL;
 			}
 			m_creature = new Creature(m_dynamicsWorld, this->strtOffset);
@@ -140,6 +167,11 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 				delete m_destructulon;
 				m_destructulon = NULL;
 			}
+			if (m_destructulon2 != NULL)
+			{
+				delete m_destructulon2;
+				m_destructulon2 = NULL;
+			}
 			if (m_creature != NULL)
 			{
 				delete m_creature;
@@ -147,6 +179,30 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 			}
 			m_destructulon = new Destructulon(m_dynamicsWorld, this->strtOffset);
 			Application::resetScene(this->strtOffset);
+			break;
+		}
+	case 'f':
+		{
+			if (m_destructulon != NULL)
+			{
+				delete m_destructulon;
+				m_destructulon = NULL;
+			}
+			if (m_destructulon2 != NULL)
+			{
+				delete m_destructulon2;
+				m_destructulon2 = NULL;
+			}
+			if (m_creature != NULL)
+			{
+				delete m_creature;
+				m_creature = NULL;
+			}
+			m_destructulon = new Destructulon(m_dynamicsWorld, this->strtOffset);
+			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -.5));
+			m_destructulon->opponent = m_destructulon2;
+			m_destructulon2->opponent = m_destructulon;
+			//Application::resetScene(this->strtOffset);
 			break;
 		}
 	case 'e':
@@ -171,6 +227,8 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 				m_creature->switchCOM();
 			else if (m_destructulon != NULL)
 				m_destructulon->switchCOM();
+			else if (m_destructulon2 != NULL)
+				m_destructulon2->switchCOM();
 			break;
 		}
 	case 'c':
@@ -215,6 +273,7 @@ void Application::exitPhysics() {
 }
 
 void Application::update() {	
+
 	if(m_creature != NULL)
 	{
 		// Always draw the COM
@@ -250,6 +309,26 @@ void Application::update() {
 
 		// Control the creature movements
 		m_destructulon->update((int)(m_currentTime - m_startTime));
+	}
+
+	if(m_destructulon2 != NULL)
+	{
+		if(m_scene->m_ball != NULL)
+			m_destructulon2->m_ball = m_scene->m_ball;
+
+		// Always draw the COM
+		if(!m_destructulon2->m_showCOM)
+			m_destructulon2->switchCOM();
+
+		// Do not update time if creature fallen
+		if (!m_destructulon2->hasFallen()) m_currentTime = GetTickCount();
+		m_elapsedTime = (int)(((double) m_currentTime - m_startTime)/100.0);
+
+		// Move the platform if not fallen
+		m_scene->update( (!m_destructulon2->hasFallen()) ? m_elapsedTime : -1, m_destructulon2->getCOM());
+
+		// Control the creature movements
+		m_destructulon2->update((int)(m_currentTime - m_startTime));
 	}
 
 	// Display info
