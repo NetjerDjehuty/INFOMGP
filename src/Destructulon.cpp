@@ -26,13 +26,15 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 	m_shapes[Destructulon::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.07), btScalar(0.40));
 	m_shapes[Destructulon::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
 	m_shapes[Destructulon::BODYPART_UPPER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.6));
-	m_shapes[Destructulon::BODYPART_UPPER_ARM]->setColor(btVector3(1,0,0));/*
-																		   m_shapes[Destructulon::BODYPART_LOWER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
-																		   m_shapes[Destructulon::BODYPART_LOWER_ARM]->setColor(btVector3(1,1,1));*/
+	m_shapes[Destructulon::BODYPART_UPPER_ARM]->setColor(btVector3(1,0,0));
+	/*
+	m_shapes[Destructulon::BODYPART_LOWER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
+	m_shapes[Destructulon::BODYPART_LOWER_ARM]->setColor(btVector3(1,1,1));*/
 	m_shapes[Destructulon::BODYPART_UPPER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.6));
-	m_shapes[Destructulon::BODYPART_UPPER_L_ARM]->setColor(btVector3(0,1,0));/*
-																			 m_shapes[Destructulon::BODYPART_LOWER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.3));
-																			 m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(1,1,1));*/
+	m_shapes[Destructulon::BODYPART_UPPER_L_ARM]->setColor(btVector3(0,1,0));
+	/*
+	m_shapes[Destructulon::BODYPART_LOWER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.3));
+	m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(1,1,1));*/
 	/*m_shapes[Destructulon::BODYPART_HEAD] = new btSphereShape(0.3);
 	m_shapes[Destructulon::BODYPART_HEAD]->setColor(btVector3(0.0,0.0,0.0));*/
 	
@@ -328,24 +330,24 @@ void Destructulon::update(int elapsedTime) {
 		if(this->opponent != NULL)
 		{
 			btVector3 opponentPos = this->opponent->m_bodies[BODYPART_UPPER_LEG]->getCenterOfMassPosition();
-			btVector3 arm = this->m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition();
 			btVector3 up = btVector3(0, 0.3, 0);
 			btTransform armOrient = m_bodies[BODYPART_UPPER_ARM]->getWorldTransform();
 			btVector3 shoulder = armOrient * up;
 
-			btVector3 shoulderToOpponent = shoulder - opponentPos;
-			btVector3 shoulderToArm = shoulder - arm;
+			btVector3 shoulderToOpponent = (shoulder - opponentPos).normalize();
+			btVector3 shoulderToArm =  btVector3(0,1,0);
 
 			btVector3 temp = btCross(shoulderToOpponent,shoulderToArm);
 
 			btScalar w = sqrt((shoulderToOpponent.length() * shoulderToOpponent.length()) * (shoulderToArm.length() * shoulderToArm.length())) + btDot(shoulderToArm, shoulderToOpponent);
 
-
 			btQuaternion Quat = btQuaternion(temp.getX(), temp.getY(), temp.getZ(), w);
+			//Quat = Quat * bTrans.getRotation();
+			Quat = Quat.normalize();
 
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat.normalize());
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat);
 			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat.normalize());
+			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat);
 			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
 		}
 #pragma endregion  BATTLE!
