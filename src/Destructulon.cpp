@@ -10,8 +10,9 @@
 #define M_PI_2     1.57079632679489661923
 #define M_PI_4     0.785398163397448309616
 
-Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3& positionOffset, Environment* environment) : m_ownerWorld (ownerWorld), m_environment(environment), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true)
+Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3& positionOffset, Environment* environment) : m_ownerWorld (ownerWorld), m_environment(environment), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true), m_positionOffset(positionOffset)
 {
+	this->m_cape = NULL;
 	this->m_ball = NULL;
 	this->opponent = NULL;
 	name = "Destructulon";
@@ -211,8 +212,7 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 #pragma endregion intialization of joints
 
 	// Initialize Cape
-	m_cape = new Cape(m_ownerWorld, m_environment, positionOffset);
-	m_cape->bindRigidBody(m_bodies[Destructulon::BODYPART_UPPER_LEG]);
+	addCape();
 }
 
 Destructulon::~Destructulon(){ // Destructor
@@ -235,7 +235,7 @@ Destructulon::~Destructulon(){ // Destructor
 		delete m_COMShape; m_COMShape = NULL;
 	}
 	// Delete Cape
-	if(m_cape) delete m_cape;
+	removeCape();
 }
 
 void Destructulon::switchCOM() {
@@ -263,7 +263,7 @@ void Destructulon::switchCOM() {
 void Destructulon::update(int elapsedTime) {
 
 	// update cape
-	if(m_cape)
+	if(m_cape != NULL)
 		m_cape->update();
 
 	// BALANCE CONTROLLER
@@ -445,4 +445,20 @@ btVector3 Destructulon::computeCenterOfMass() {
 	return ret/totMass;
 	//===========================================//
 
+}
+
+
+// Toggle/Add/Remove this creature's cape
+void Destructulon::toggleCape() {
+	m_cape == NULL ? addCape() : removeCape();
+}
+void Destructulon::addCape() {
+	if (m_cape != NULL) return;
+	m_cape = new Cape(m_ownerWorld, m_environment, m_positionOffset);
+	m_cape->bindRigidBody(m_bodies[Destructulon::BODYPART_UPPER_LEG]);
+}
+void Destructulon::removeCape() {
+	if(m_cape == NULL) return;
+	delete m_cape;
+	m_cape = NULL;
 }

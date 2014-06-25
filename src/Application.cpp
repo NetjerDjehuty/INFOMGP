@@ -259,6 +259,13 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 			m_scene->shootCannon();
 			break;
 		}
+	case 'p':
+		{
+			// toggle cape
+			if(m_destructulon != NULL) m_destructulon->toggleCape();
+			if(m_destructulon2 != NULL) m_destructulon2->toggleCape();
+			break;
+		}
 	default :
 		DemoApplication::keyboardCallback(key, x, y);
 	}	

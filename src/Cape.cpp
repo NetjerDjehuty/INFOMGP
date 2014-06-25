@@ -4,13 +4,17 @@
 
 // CAPE
 
-Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment, const btVector3& offset) : m_ownerWorld (ownerWorld), m_environment (environment) { // Constructor
- 
+Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment, const btVector3& offset) : m_ownerWorld (ownerWorld), m_environment (environment), m_offset (offset) { // Constructor
+	
+	this->m_softBody = NULL;
+
+	// cape dimensions
 	const btScalar	halfWidth=0.1f;
 	const btScalar  halfHeight=halfWidth*2;
 	const int		resolution=20;
-	btVector3 pos(0.01f, 1.25f, offset.z());
+	btVector3 pos(0.01f, 1.25f, m_offset.z());
 	
+	// create soft body
 	m_softBody = btSoftBodyHelpers::CreatePatch(
 		m_environment->m_softBodyWorldInfo,
 		btVector3(-halfWidth,0,-halfHeight),
@@ -47,23 +51,19 @@ Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment, cons
 }
 
 Cape::~Cape(){ // Destructor
-    
+	if (m_softBody == NULL) return; 
 	m_ownerWorld->removeSoftBody(m_softBody);
 	delete m_softBody;
-
+	m_softBody = NULL;
 }
 
 // bind cape to the given rigidbody
 void Cape::bindRigidBody(btRigidBody *body) {
-
 	m_softBody->appendAnchor(0,body);
 	m_softBody->appendAnchor(18,body);
-
 }
 
 void Cape::update() {
-	
 	// set updated wind force
 	m_softBody->setWindVelocity(m_environment->m_windVelocity);
-
 }

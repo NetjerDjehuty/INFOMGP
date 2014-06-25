@@ -24,6 +24,7 @@ public:
 	Destructulon*	opponent;			// Ball
 
 	btVector3 getCOM() {return m_positionCOM;}	// Return the position of the COM
+	void toggleCape();					// Change visibility of the cape
 
 public:
 
@@ -31,6 +32,7 @@ public:
 
 	enum {JOINT_ANKLE,JOINT_KNEE, JOINT_SHOULDER, /*JOINT_ELBOW,*/ JOINT_L_SHOULDER, /*JOINT_L_ELBOW, JOINT_NECK,*/ JOINT_COUNT}; // Joints of the creature
 
+	const btVector3             m_positionOffset;           // Initial position
 	btSoftRigidDynamicsWorld *  m_ownerWorld;				// The physics world of the simulation
 	btCollisionShape		 *	m_shapes[BODYPART_COUNT];	// The primitive shape of each body part used in collision
 	btRigidBody				 *	m_bodies[BODYPART_COUNT];	// The array of body parts
@@ -46,6 +48,10 @@ public:
 	btRigidBody			*	m_COM;			// Body COM
 	btVector3				m_positionCOM;	// Position COM
 	btVector3 computeCenterOfMass();		// Compute the COM of the creature in world coordinate system
+
+protected:
+	void addCape();
+	void removeCape();
 };
 
 #endif
