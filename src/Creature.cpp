@@ -160,7 +160,8 @@ void Creature::update(int elapsedTime) {
 	m_positionCOM = comInWorld;
 	if (m_showCOM) { // Visualize COM
 		btTransform transform;
-		m_COM->getMotionState()->getWorldTransform(transform);
+		transform.setIdentity();
+		//m_COM->getMotionState()->getWorldTransform(transform);
 		transform.setOrigin(comInWorld);
 		m_COM->getMotionState()->setWorldTransform(transform);
 	}
@@ -195,33 +196,34 @@ void Creature::update(int elapsedTime) {
 			btHingeConstraint* currentJoint = ((btHingeConstraint*)m_joints[i]);
 			btCollisionObject* bodyPart = m_bodies[i];
 
+			float totMass = computeTotalMass();
+			float massAbove = computeTotalMass((Part)(i+1));
+
 			btTransform bodySpace = bodyPart->getWorldTransform().inverse();
 			btTransform jointSpace = currentJoint->getAFrame();
 
+
 			btTransform bodyRot = bodySpace;
 			bodyRot.setOrigin(btVector3(0,0,0));
-			btVector3 grav = bodyRot * btVector3(0, -1, 0);
-			btVector3 comNoTurn = computeCenterOfMass();
-			btVector3 comTotal = bodySpace * comNoTurn;
-			btVector3 csp = (bodySpace * comFoot) - comTotal;
+			btVector3 grav = (bodyRot * btVector3(0, -1, 0)).normalize();
+			btVector3 comTotal = bodySpace * computeCenterOfMass();
+			btVector3 csp = -(comTotal-(bodySpace * comFoot));
 			btVector3 projOnCSP = csp - (csp.dot(grav) * grav);
 
 			btTransform jointRot = jointSpace;
 			jointRot.setOrigin(btVector3(0,0,0));
 			btVector3 errorAxis = jointRot * btVector3(1,0,0);
+			btScalar error = projOnCSP.dot(errorAxis);
 
-			btScalar error = (projOnCSP * computeTotalMass()).dot(errorAxis);
-
-			float massAbove = computeTotalMass((Part)(i+1));
-			float length = (bodySpace * computeCenterOfMass((Part)(i+1))).distance(jointSpace.getOrigin())* massAbove;
+			float length = (bodySpace * computeCenterOfMass((Part)(i+1))).distance(jointSpace.getOrigin());
 			
 #define CLAMP(a,b,c) ((a) < (b) ? (b) : ((a) > (c) ? (c) : (a)))
 
-			float target = acos(-CLAMP(error/length, -1.0f, 1.0f)) - M_PI_2;
-			float cAngle =  currentJoint->getHingeAngle();
+			float target = acos(-CLAMP((error * totMass)/(length * massAbove), -1.0f, 1.0f)) - M_PI_2;
+			float cAngle = currentJoint->getHingeAngle();
 
-			currentJoint->setMotorTarget( target - cAngle );
-			//currentJoint->setMotorTarget( -cAngle );
+			//currentJoint->setMotorTarget( (target - cAngle) ); //This one should work, but doesn't for some reason.
+			currentJoint->setMotorTarget(error * 10.0f);
 		}
 
 		//((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() ) * 20.0f );
