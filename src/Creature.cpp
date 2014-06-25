@@ -201,7 +201,8 @@ void Creature::update(int elapsedTime) {
 			btTransform bodyRot = bodySpace;
 			bodyRot.setOrigin(btVector3(0,0,0));
 			btVector3 grav = bodyRot * btVector3(0, -1, 0);
-			btVector3 comTotal = bodySpace * computeCenterOfMass();
+			btVector3 comNoTurn = computeCenterOfMass();
+			btVector3 comTotal = bodySpace * comNoTurn;
 			btVector3 csp = (bodySpace * comFoot) - comTotal;
 			btVector3 projOnCSP = csp - (csp.dot(grav) * grav);
 
@@ -209,20 +210,18 @@ void Creature::update(int elapsedTime) {
 			jointRot.setOrigin(btVector3(0,0,0));
 			btVector3 errorAxis = jointRot * btVector3(1,0,0);
 
-			//btScalar error = (csp - (csp.dot(comGrav) * comGrav)).dot(errorAxis);
-			btScalar error = projOnCSP.dot(errorAxis);
+			btScalar error = (projOnCSP * computeTotalMass()).dot(errorAxis);
 
-			/*
-			btTransform lowerJointSpace = currentJoint->getAFrame();
-			btVector3 comAbove = lowerJointSpace * computeCenterOfMass((Part)i);*/
-			float massAbove = computeTotalMass((Part)i);
-			/*
-			btVector3 comBelow = lowerJointSpace * computeCenterOfMassBelow((Part)i);
-			float massBelow = computeTotalMassBelow((Part)i);
-			*/
+			float massAbove = computeTotalMass((Part)(i+1));
+			float length = (bodySpace * computeCenterOfMass((Part)(i+1))).distance(jointSpace.getOrigin())* massAbove;
+			
+#define CLAMP(a,b,c) ((a) < (b) ? (b) : ((a) > (c) ? (c) : (a)))
 
-			//currentJoint->setMotorTarget( error * 20.0f );
-			currentJoint->setMotorTarget( error * 10 );
+			float target = acos(-CLAMP(error/length, -1.0f, 1.0f)) - M_PI_2;
+			float cAngle =  currentJoint->getHingeAngle();
+
+			currentJoint->setMotorTarget( target - cAngle );
+			//currentJoint->setMotorTarget( -cAngle );
 		}
 
 		//((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() ) * 20.0f );
