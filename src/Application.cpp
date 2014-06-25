@@ -140,26 +140,16 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 			if (m_creature != NULL)
 			{
 				delete m_creature;
-				if(m_destructulon != NULL)
-					if(m_destructulon->opponent != NULL)
-						m_destructulon->opponent = NULL;
-				if(m_destructulon2 != NULL)
-					if(m_destructulon2->opponent != NULL)
-						m_destructulon2->opponent = NULL;
 				m_creature = NULL;
 			}
 			if (m_destructulon2 != NULL)
 			{
-				delete m_destructulon2;
-				if(m_destructulon2->opponent != NULL)
-					m_destructulon2->opponent = NULL;
+				delete m_destructulon2;			
 				m_destructulon2 = NULL;
 			}
 			if(m_destructulon != NULL)
 			{
 				delete m_destructulon;
-				if(m_destructulon->opponent != NULL)
-					m_destructulon->opponent = NULL;
 				m_destructulon = NULL;
 			}
 			m_creature = new Creature(m_dynamicsWorld, this->strtOffset);
@@ -208,7 +198,7 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -0.25));
 			m_destructulon->opponent = m_destructulon2;
 			m_destructulon2->opponent = m_destructulon;
-			//Application::resetScene(this->strtOffset);
+			Application::resetScene(this->strtOffset);
 			break;
 		}
 	case 'e':
