@@ -4,7 +4,7 @@
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 
 
-// Environmental Forces
+// Environmental Forces (wind)
 
 class Environment {
 
@@ -12,15 +12,15 @@ public:
 	Environment(btSoftRigidDynamicsWorld* ownerWorld); // Constructor
 	virtual	~Environment(); // Destructor
 
-	void resetScene();
-	void update();
+	void resetScene();  // Reset to default environment values
+	void update();      // Update forces
     
-	btSoftBodyWorldInfo	m_softBodyWorldInfo;
-	btVector3 m_windVelocity;
+	btSoftBodyWorldInfo	m_softBodyWorldInfo;  // Holding environment configuration
+	btVector3 m_windVelocity;                 // Holding wind strength and direction
 
 protected:
 	btDynamicsWorld		*	m_ownerWorld;				// The physics world of the simulation
-	btVector3               m_windForce;
+	float                   m_timer;                    // Timer used to dynamic change wind forces
 };
 
 

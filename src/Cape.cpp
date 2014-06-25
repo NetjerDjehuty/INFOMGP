@@ -6,44 +6,44 @@
 
 Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_ownerWorld (ownerWorld), m_environment (environment) { // Constructor
  
-	const btScalar	s=0.1;
-	const btScalar	h=1.35;
-	const int		r=20;
+	const btScalar	halfWidth=0.1f;
+	const btScalar  halfHeight=halfWidth*2;
+	const int		resolution=20;
+	btVector3 pos(0.01f, 1.25f, 0.0f);
 	
-	int fixed=0;//4+8;
-	btSoftBody*	psb = btSoftBodyHelpers::CreatePatch(
+	m_softBody = btSoftBodyHelpers::CreatePatch(
 		m_environment->m_softBodyWorldInfo,
-		btVector3(-s,0,-s),
-		btVector3(+s,0,-s),
-		btVector3(-s,0,+s*3),
-		btVector3(+s,0,+s*3),
-		r,r,
-		fixed,
+		btVector3(-halfWidth,0,-halfHeight),
+		btVector3(+halfWidth,0,-halfHeight),
+		btVector3(-halfWidth,0,+halfHeight),
+		btVector3(+halfWidth,0,+halfHeight),
+		resolution, resolution,
+		0, //4+8
 		true);
 	
-	psb->m_cfg.kLF			=	0.05;
-	psb->m_cfg.kDG			=	0.001;
-	psb->m_cfg.kAHR         =   1;
-	psb->m_cfg.kDF          =   0;
-	psb->m_cfg.piterations  =   10;
+	// soft body configuration
+	m_softBody->m_cfg.kLF		   =   0.05f;
+	m_softBody->m_cfg.kDG		   =   0.001f;
+	m_softBody->m_cfg.kAHR         =   1.0f;
+	m_softBody->m_cfg.kDF          =   0.0f;
+	m_softBody->m_cfg.piterations  =   10;
+	m_softBody->m_cfg.aeromodel	   =   btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
 	
-	psb->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
-	
-
+	// positioning
 	btTransform		trs;
 	btQuaternion	rot;
-	btVector3 pos(0.01, h, 0);
 	rot.setRotation(btVector3(1, 0, 0), btScalar(SIMD_PI/2));
 	trs.setIdentity();
 	trs.setOrigin(pos);
 	trs.setRotation(rot);
-	psb->transform(trs);
-	psb->setTotalMass(0.1);
+	m_softBody->transform(trs);
+	m_softBody->setTotalMass(0.1f);
 
-	psb->getCollisionShape()->setMargin(0.05);
+	// collission distance
+	m_softBody->getCollisionShape()->setMargin(0.05f);
 
-	m_ownerWorld->addSoftBody(psb);
-	m_softBody = psb;
+	// add to dynamicsworld
+	m_ownerWorld->addSoftBody(m_softBody);
 }
 
 Cape::~Cape(){ // Destructor
@@ -53,7 +53,7 @@ Cape::~Cape(){ // Destructor
 
 }
 
-
+// bind cape to the given rigidbody
 void Cape::bindRigidBody(btRigidBody *body) {
 
 	m_softBody->appendAnchor(0,body);
