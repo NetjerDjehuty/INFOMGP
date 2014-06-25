@@ -319,24 +319,24 @@ void Destructulon::update(int elapsedTime) {
 		if(this->opponent != NULL)
 		{
 			btVector3 opponentPos = this->opponent->m_bodies[BODYPART_UPPER_LEG]->getCenterOfMassPosition();
-			btVector3 arm = this->m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition();
 			btVector3 up = btVector3(0, 0.3, 0);
 			btTransform armOrient = m_bodies[BODYPART_UPPER_ARM]->getWorldTransform();
 			btVector3 shoulder = armOrient * up;
 
-			btVector3 shoulderToOpponent = shoulder - opponentPos;
-			btVector3 shoulderToArm = shoulder - arm;
+			btVector3 shoulderToOpponent = (shoulder - opponentPos).normalize();
+			btVector3 shoulderToArm =  btVector3(0,1,0);
 
 			btVector3 temp = btCross(shoulderToOpponent,shoulderToArm);
 
 			btScalar w = sqrt((shoulderToOpponent.length() * shoulderToOpponent.length()) * (shoulderToArm.length() * shoulderToArm.length())) + btDot(shoulderToArm, shoulderToOpponent);
 
-
 			btQuaternion Quat = btQuaternion(temp.getX(), temp.getY(), temp.getZ(), w);
+			//Quat = Quat * bTrans.getRotation();
+			Quat = Quat.normalize();
 
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat.normalize());
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat);
 			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat.normalize());
+			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat);
 			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
 		}
 #pragma endregion  BATTLE!
