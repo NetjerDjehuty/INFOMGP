@@ -395,29 +395,36 @@ void Application::renderme() {
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
-	
+
 	btSoftRigidDynamicsWorld* softWorld = (btSoftRigidDynamicsWorld*)m_dynamicsWorld;
 
+	// set flags for the build in drawer
+	softWorld->setDrawFlags(fDrawFlags::Faces); 
+
+	// combine built in drawer + custom OpenGL drawing
 	for (  int j=0;j<softWorld->getSoftBodyArray().size();j++)
 	{
 		btSoftBody*	psb=(btSoftBody*)softWorld->getSoftBodyArray()[j];
+
+		// built in drawer
+		btSoftBodyHelpers::Draw(psb,softWorld->getDebugDrawer(),softWorld->getDrawFlags());
 		
-		//btSoftBodyHelpers::Draw(psb,softWorld->getDebugDrawer(),softWorld->getDrawFlags());
-		
+		// custom draw lines
 		for(int i=0;i<psb->m_links.size();++i)
 		{
 			const btSoftBody::Link&	l=psb->m_links[i];
-			drawLine(l.m_n[0]->m_x, l.m_n[1]->m_x, btVector3(0.8,0,0));
+			drawLine(l.m_n[0]->m_x, l.m_n[1]->m_x, btVector3(0,0.8,0));
 		}
 	}
 
+	// Call to the super class
 	GlutDemoApplication::renderme();
 }
 
 void Application::drawLine(btVector3& from, btVector3& to,const btVector3 &clr)
 {
 	glColor3f(clr.getX(),clr.getY(),clr.getZ());
-	glBegin(GL_LINES);
+	glBegin(GL_LINE);
 	glVertex3f(from.getX(),from.getY(),from.getZ());
 	glVertex3f(to.getX(),to.getY(),to.getZ());
 	glEnd();
