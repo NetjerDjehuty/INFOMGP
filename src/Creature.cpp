@@ -79,8 +79,11 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 
 	// KNEE
 	localA.setIdentity(); localB.setIdentity();
-	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.25), btScalar(0.0)));
-	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.20), btScalar(0.0)));
+	//localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.25), btScalar(0.0)));
+	//localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.20), btScalar(0.0)));
+	
+	localA.getBasis().setEulerZYX(0,0,0); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.25), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0,0,0); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.20), btScalar(0.0)));
 	hingeJoint = new btHingeConstraint(*m_bodies[Creature::BODYPART_LOWER_LEG], *m_bodies[Creature::BODYPART_UPPER_LEG], localA, localB);
 	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
 
@@ -191,17 +194,23 @@ void Creature::update(int elapsedTime) {
 		{
 			btHingeConstraint* currentJoint = ((btHingeConstraint*)m_joints[i]);
 			btCollisionObject* bodyPart = m_bodies[i];
+
 			btTransform bodySpace = bodyPart->getWorldTransform().inverse();
-			//btTransform jointSpace = currentJoint->getRigidBodyA().getWorldTransform().inverse();
+			btTransform jointSpace = currentJoint->getAFrame();
 
+			btTransform bodyRot = bodySpace;
+			bodyRot.setOrigin(btVector3(0,0,0));
+			btVector3 grav = bodyRot * btVector3(0, -1, 0);
 			btVector3 comTotal = bodySpace * computeCenterOfMass();
-			btVector3 comGrav = (bodySpace * (computeCenterOfMass() + btVector3(0,-1,0))) - comTotal;
 			btVector3 csp = (bodySpace * comFoot) - comTotal;
+			btVector3 projOnCSP = csp - (csp.dot(grav) * grav);
 
-			btTransform relJoint = currentJoint->getAFrame();
-			btVector3 errorAxis = relJoint * btVector3(0,0,1);
+			btTransform jointRot = jointSpace;
+			jointRot.setOrigin(btVector3(0,0,0));
+			btVector3 errorAxis = jointRot * btVector3(1,0,0);
 
-			btScalar error = (csp - (csp.dot(comGrav) * comGrav)).dot(errorAxis);
+			//btScalar error = (csp - (csp.dot(comGrav) * comGrav)).dot(errorAxis);
+			btScalar error = projOnCSP.dot(errorAxis);
 
 			/*
 			btTransform lowerJointSpace = currentJoint->getAFrame();
@@ -212,7 +221,8 @@ void Creature::update(int elapsedTime) {
 			float massBelow = computeTotalMassBelow((Part)i);
 			*/
 
-			currentJoint->setMotorTarget( error * 20.0f );
+			//currentJoint->setMotorTarget( error * 20.0f );
+			currentJoint->setMotorTarget( error * 10 );
 		}
 
 		//((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() ) * 20.0f );
