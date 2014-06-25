@@ -31,14 +31,14 @@ public:
 
 protected:
 
+	virtual void renderme();                    // Overwrite render function to draw soft bodies
 	virtual void clientMoveAndDisplay();		// Update the simulation
 	virtual void displayCallback();				// Render the simulation
-	virtual void renderme();                    // Overwrite render function to draw soft bodies
-
-	virtual void keyboardCallback(unsigned char key, int x, int y); // Input management
+	virtual void keyboardCallback(unsigned char key, int x, int y); // Input management	
 
 	void resetScene(const btVector3& startOffset);	// Reset the creature
 	void update();									// Update objects and display the time elapsed under balance
+	void drawLine(btVector3& from, btVector3& to, const btVector3 &clr);  // Helper to draw soft bodies
 
 	Destructulon					*	m_destructulon;	// The first Destructulon
 	Destructulon					*	m_destructulon2;// The Second Destructulon
