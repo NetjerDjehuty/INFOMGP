@@ -368,6 +368,8 @@ void Application::update() {
 
 	// Display info
 	DemoApplication::displayProfileString(10,20,"Q=quit E=reset R=platform T=ball Y=COM U=switch I=pause");
+	DemoApplication::displayProfileString(10,40,"A=Creature D=destructulon F=fight C=canon P=cape");
+
 
 	// Display time elapsed
 	std::ostringstream osstmp;
@@ -378,7 +380,12 @@ void Application::update() {
 		oss << "Time under balance: 0." << s_elapsedTime << " seconds";
 	else
 		oss << "Time under balance: " << s_elapsedTime.substr(0,s_elapsedTime.size()-1) << "." << s_elapsedTime.substr(s_elapsedTime.size()-1,s_elapsedTime.size()) << " seconds";
-	DemoApplication::displayProfileString(10,40,const_cast<char*>(oss.str().c_str()));	
+	DemoApplication::displayProfileString(10,60,const_cast<char*>(oss.str().c_str()));	
+
+	// Display wind
+	std::ostringstream ss; 
+	ss << "Wind: " << m_environment->m_windVelocity.z();
+	DemoApplication::displayProfileString(10,80,const_cast<char*>(ss.str().c_str()));
 }
 
 
