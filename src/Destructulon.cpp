@@ -263,6 +263,9 @@ void Destructulon::switchCOM() {
 
 void Destructulon::update(int elapsedTime) {
 
+	// update cape
+	if(m_cape)
+		m_cape->update();
 
 	// BALANCE CONTROLLER
 	// ==================

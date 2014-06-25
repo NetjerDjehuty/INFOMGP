@@ -16,10 +16,11 @@ public:
 	void update();
     
 	btSoftBodyWorldInfo	m_softBodyWorldInfo;
+	btVector3 m_windVelocity;
 
 protected:
 	btDynamicsWorld		*	m_ownerWorld;				// The physics world of the simulation
-
+	btVector3               m_windForce;
 };
 
 

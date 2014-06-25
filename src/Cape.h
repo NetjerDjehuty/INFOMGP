@@ -13,6 +13,7 @@ public:
 	virtual ~Cape(); // Destructor
 	
 	void bindRigidBody(btRigidBody *body);
+	void update();
 
 protected:
 	btSoftRigidDynamicsWorld  *	m_ownerWorld;				// The physics world of the simulation

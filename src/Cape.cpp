@@ -28,7 +28,6 @@ Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_
 	psb->m_cfg.piterations  =   10;
 	
 	psb->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
-	psb->setWindVelocity(btVector3(0, 115, 125.0));
 	
 
 	btTransform		trs;
@@ -62,3 +61,9 @@ void Cape::bindRigidBody(btRigidBody *body) {
 
 }
 
+void Cape::update() {
+	
+	// set updated wind force
+	m_softBody->setWindVelocity(m_environment->m_windVelocity);
+
+}
