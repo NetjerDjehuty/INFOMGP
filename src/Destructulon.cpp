@@ -34,7 +34,7 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 																			 m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(1,1,1));*/
 	/*m_shapes[Destructulon::BODYPART_HEAD] = new btSphereShape(0.3);
 	m_shapes[Destructulon::BODYPART_HEAD]->setColor(btVector3(0.0,0.0,0.0));*/
-
+	
 #pragma endregion Setup the collision shapes
 
 	// Setup the body properties
@@ -58,7 +58,7 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.725), btScalar(0.0)));
 	m_bodies[Destructulon::BODYPART_UPPER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Destructulon::BODYPART_UPPER_LEG]);
-
+	
 	// UPPER_ARM
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(-0.1), btScalar(0.8), btScalar(0.0)));
@@ -213,7 +213,7 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 
 	// Cape
 	m_cape = new Cape(m_ownerWorld, m_environment);
-	m_cape->bindRigidBody(m_bodies[Destructulon::BODYPART_UPPER_L_ARM], m_bodies[Destructulon::BODYPART_UPPER_ARM]);
+	m_cape->bindRigidBody(m_bodies[Destructulon::BODYPART_UPPER_LEG]);
 }
 
 Destructulon::~Destructulon(){ // Destructor

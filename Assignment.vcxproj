@@ -92,7 +92,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>.\Bullet\BulletSRC\Extras\Glut;.\Bullet\BulletLIB;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32s.lib;glut32.lib;OpenGLSupport.lib;LinearMath.lib;BulletCollision.lib;BulletDynamics.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glut32.lib;OpenGLSupport.lib;LinearMath.lib;BulletCollision.lib;BulletDynamics.lib;BulletSoftBody.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <ResourceCompile>
