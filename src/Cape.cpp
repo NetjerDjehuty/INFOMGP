@@ -4,12 +4,12 @@
 
 // CAPE
 
-Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_ownerWorld (ownerWorld), m_environment (environment) { // Constructor
+Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment, const btVector3& offset) : m_ownerWorld (ownerWorld), m_environment (environment) { // Constructor
  
 	const btScalar	halfWidth=0.1f;
 	const btScalar  halfHeight=halfWidth*2;
 	const int		resolution=20;
-	btVector3 pos(0.01f, 1.25f, 0.0f);
+	btVector3 pos(0.01f, 1.25f, offset.z());
 	
 	m_softBody = btSoftBodyHelpers::CreatePatch(
 		m_environment->m_softBodyWorldInfo,

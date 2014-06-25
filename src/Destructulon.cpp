@@ -210,9 +210,8 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 
 #pragma endregion intialization of joints
 
-
-	// Cape
-	m_cape = new Cape(m_ownerWorld, m_environment);
+	// Initialize Cape
+	m_cape = new Cape(m_ownerWorld, m_environment, positionOffset);
 	m_cape->bindRigidBody(m_bodies[Destructulon::BODYPART_UPPER_LEG]);
 }
 
@@ -236,7 +235,7 @@ Destructulon::~Destructulon(){ // Destructor
 		delete m_COMShape; m_COMShape = NULL;
 	}
 	// Delete Cape
-	delete m_cape;
+	if(m_cape) delete m_cape;
 }
 
 void Destructulon::switchCOM() {

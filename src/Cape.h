@@ -9,7 +9,7 @@
 class Cape {
 
 public:
-	Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment); // Constructor
+	Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment, const btVector3& offset); // Constructor
 	virtual ~Cape(); // Destructor
 	
 	void bindRigidBody(btRigidBody *body);  // Bind the corners of the cape to some rigidbody
