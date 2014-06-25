@@ -10,7 +10,7 @@
 #define M_PI_2     1.57079632679489661923
 #define M_PI_4     0.785398163397448309616
 
-Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positionOffset) : m_ownerWorld (ownerWorld), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true)
+Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3& positionOffset, Environment* environment) : m_ownerWorld (ownerWorld), m_environment(environment), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true)
 {
 	this->m_ball = NULL;
 	this->opponent = NULL;
@@ -209,6 +209,11 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	*/
 
 #pragma endregion intialization of joints
+
+
+	// Cape
+	m_cape = new Cape(m_ownerWorld, m_environment);
+
 }
 
 Destructulon::~Destructulon(){ // Destructor
@@ -230,6 +235,8 @@ Destructulon::~Destructulon(){ // Destructor
 		delete m_COM; m_COM = NULL;
 		delete m_COMShape; m_COMShape = NULL;
 	}
+	// Delete Cape
+	delete m_cape;
 }
 
 void Destructulon::switchCOM() {

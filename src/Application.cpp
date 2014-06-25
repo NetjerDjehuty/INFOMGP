@@ -1,5 +1,8 @@
 
 #include "btBulletDynamicsCommon.h"
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletSoftBody/btSoftBodyHelpers.h"
+#include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
 #include "GlutStuff.h"
 #include "GL_ShapeDrawer.h"
 #include "LinearMath/btIDebugDraw.h"
@@ -16,17 +19,24 @@
 void Application::initPhysics() {
 
 	this->creatureCreated = false;
+	
 	// Setup the basic world
 	// =====================
 	setTexturing(true);
 	setShadows(true);
-	m_collisionConfiguration = new btDefaultCollisionConfiguration();
+	m_collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
 	m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
 	btVector3 worldAabbMin(-10000,-10000,-10000);
 	btVector3 worldAabbMax(10000,10000,10000);
 	m_broadphase = new btAxisSweep3 (worldAabbMin, worldAabbMax);
 	m_solver = new btSequentialImpulseConstraintSolver;
-	m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher,m_broadphase,m_solver,m_collisionConfiguration);
+	m_dynamicsWorld = new btSoftRigidDynamicsWorld(m_dispatcher,m_broadphase,m_solver,m_collisionConfiguration);
+
+	// Setup Environmental Forces
+	m_environment = new Environment((btSoftRigidDynamicsWorld*) m_dynamicsWorld);
+    m_environment->m_softBodyWorldInfo.m_dispatcher = m_dispatcher;
+    m_environment->m_softBodyWorldInfo.m_broadphase = m_broadphase;
+    m_environment->m_softBodyWorldInfo.m_sparsesdf.Initialize();
 
 	// Setup a big ground box
 	// ======================
@@ -62,19 +72,19 @@ void Application::resetScene(const btVector3& startOffset) {
 		delete m_destructulon;
 		m_destructulon = NULL;
 		if(m_destructulon == NULL)
-			m_destructulon = new Destructulon(m_dynamicsWorld, startOffset);
+			m_destructulon = new Destructulon((btSoftRigidDynamicsWorld*)m_dynamicsWorld, startOffset, m_environment);
 	}
 	if(m_destructulon2 != NULL)
 	{
 		delete m_destructulon;
 		m_destructulon = NULL;
 		if(m_destructulon == NULL)
-			m_destructulon = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, 0.25));
+			m_destructulon = new Destructulon((btSoftRigidDynamicsWorld*)m_dynamicsWorld, btVector3(0, 0.55, 0.25), m_environment);
 
 		delete m_destructulon2;
 		m_destructulon2 = NULL;
 		if(m_destructulon2 == NULL)
-			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -0.25));
+			m_destructulon2 = new Destructulon((btSoftRigidDynamicsWorld*)m_dynamicsWorld, btVector3(0, 0.55, -0.25), m_environment);
 
 		if(m_destructulon != NULL)
 			m_destructulon2->opponent = m_destructulon;
@@ -94,6 +104,9 @@ void Application::resetScene(const btVector3& startOffset) {
 	if (m_scene != NULL) delete m_scene;
 	m_scene = new Scene(m_dynamicsWorld);
 	m_startTime = GetTickCount();
+
+	// reset environmental forces
+	m_environment->resetScene();
 }
 
 void Application::clientMoveAndDisplay() {
@@ -112,6 +125,10 @@ void Application::clientMoveAndDisplay() {
 	// Update the Scene
 	// ================
 	update();
+
+	// Garbage collecting Environmental Forces
+	if (m_environment)
+		m_environment->m_softBodyWorldInfo.m_sparsesdf.GarbageCollect();
 
 	// Render the simulation
 	// =====================
@@ -183,7 +200,7 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 				delete m_creature;
 				m_creature = NULL;
 			}
-			m_destructulon = new Destructulon(m_dynamicsWorld, this->strtOffset);
+			m_destructulon = new Destructulon((btSoftRigidDynamicsWorld*)m_dynamicsWorld, this->strtOffset, m_environment);
 			Application::resetScene(this->strtOffset);
 			break;
 		}
@@ -204,8 +221,8 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 				delete m_creature;
 				m_creature = NULL;
 			}
-			m_destructulon = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, 0.25));
-			m_destructulon2 = new Destructulon(m_dynamicsWorld, btVector3(0, 0.55, -0.25));
+			m_destructulon = new Destructulon((btSoftRigidDynamicsWorld*)m_dynamicsWorld, btVector3(0, 0.55, 0.25), m_environment);
+			m_destructulon2 = new Destructulon((btSoftRigidDynamicsWorld*)m_dynamicsWorld, btVector3(0, 0.55, -0.25), m_environment);
 			m_destructulon->opponent = m_destructulon2;
 			m_destructulon2->opponent = m_destructulon;
 			//Application::resetScene(this->strtOffset);
@@ -276,6 +293,8 @@ void Application::exitPhysics() {
 	//delete collision configuration
 	delete m_collisionConfiguration;
 
+	//delete environment
+	delete m_environment;
 }
 
 void Application::update() {	
@@ -337,6 +356,9 @@ void Application::update() {
 		m_destructulon2->update((int)(m_currentTime - m_startTime));
 	}
 
+	// Update environment
+	m_environment->update();
+
 	// Display info
 	DemoApplication::displayProfileString(10,20,"Q=quit E=reset R=platform T=ball Y=COM U=switch I=pause");
 
@@ -350,4 +372,29 @@ void Application::update() {
 	else
 		oss << "Time under balance: " << s_elapsedTime.substr(0,s_elapsedTime.size()-1) << "." << s_elapsedTime.substr(s_elapsedTime.size()-1,s_elapsedTime.size()) << " seconds";
 	DemoApplication::displayProfileString(10,40,const_cast<char*>(oss.str().c_str()));	
+}
+
+
+// overwrite default GLUT renderme
+// to also draw the softbodies
+void Application::renderme() {
+
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
+	//m_dynamicsWorld->debugDrawWorld();
+
+	btSoftRigidDynamicsWorld* softWorld = (btSoftRigidDynamicsWorld*)m_dynamicsWorld;
+	//btIDebugDraw*	sdraw = softWorld ->getDebugDrawer();
+	
+	for (  int i=0;i<softWorld->getSoftBodyArray().size();i++)
+	{
+		btSoftBody*	psb=(btSoftBody*)softWorld->getSoftBodyArray()[i];
+		if (softWorld->getDebugDrawer() && !(softWorld->getDebugDrawer()->getDebugMode() & (btIDebugDraw::DBG_DrawWireframe)))
+		{
+			btSoftBodyHelpers::DrawFrame(psb,softWorld->getDebugDrawer());
+			btSoftBodyHelpers::Draw(psb,softWorld->getDebugDrawer(),softWorld->getDrawFlags());
+		}
+	}
+
+	GlutDemoApplication::renderme();
 }

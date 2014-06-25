@@ -67,7 +67,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>.\Bullet\BulletSRC\Extras\Glut;.\Bullet\BulletLIB;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32s.lib;glut32.lib;OpenGLSupport_debug.lib;LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glut32.lib;OpenGLSupport_debug.lib;LinearMath_debug.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;BulletSoftBody_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <ResourceCompile>
@@ -103,14 +103,18 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Cape.h" />
     <ClInclude Include="src\Creature.h" />
     <ClInclude Include="src\Destructulon.h" />
+    <ClInclude Include="src\Environment.h" />
     <ClInclude Include="src\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Cape.cpp" />
     <ClCompile Include="src\Creature.cpp" />
     <ClCompile Include="src\Destructulon.cpp" />
+    <ClCompile Include="src\Environment.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Scene.cpp" />
   </ItemGroup>
