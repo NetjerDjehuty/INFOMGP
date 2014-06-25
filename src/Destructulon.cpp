@@ -213,7 +213,7 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 
 	// Cape
 	m_cape = new Cape(m_ownerWorld, m_environment);
-
+	m_cape->bindRigidBody(m_bodies[Destructulon::BODYPART_UPPER_L_ARM], m_bodies[Destructulon::BODYPART_UPPER_ARM]);
 }
 
 Destructulon::~Destructulon(){ // Destructor

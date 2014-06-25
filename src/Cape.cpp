@@ -11,17 +11,17 @@ using namespace std;
 
 Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_ownerWorld (ownerWorld), m_environment (environment) { // Constructor
  
-	const btScalar	s=0.2;
+	const btScalar	s=0.1;
 	const btScalar	h=1.5;
 	const int		r=20;
 	
-	int fixed=4+8;//4+8;
+	int fixed=0;//4+8;
 	btSoftBody*	psb = btSoftBodyHelpers::CreatePatch(
 		m_environment->m_softBodyWorldInfo,
 		btVector3(-s,0,-s),
 		btVector3(+s,0,-s),
-		btVector3(-s,0,+s),
-		btVector3(+s,0,+s),
+		btVector3(-s,0,+s*3),
+		btVector3(+s,0,+s*3),
 		r,r,
 		fixed,
 		true);
@@ -44,18 +44,19 @@ Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_
 	//psb->m_cfg.kDG			=	0.01;
 	psb->m_cfg.piterations = 10;
 	//	psb->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
-	psb->setWindVelocity(btVector3(4, -10, -25.0));
+	
+	//psb->setWindVelocity(btVector3(4, -10, -25.0));
 	
 
 	btTransform		trs;
 	btQuaternion	rot;
-	btVector3 pos(0, h, 0.5);
+	btVector3 pos(0.01, h, 0.1);
 	rot.setRotation(btVector3(1, 0, 0), btScalar(SIMD_PI/2));
 	trs.setIdentity();
 	trs.setOrigin(pos);
 	trs.setRotation(rot);
 	psb->transform(trs);
-	psb->setTotalMass(2);
+	psb->setTotalMass(0.000001);
 
 
 	m_ownerWorld->addSoftBody(psb);
@@ -72,4 +73,11 @@ Cape::~Cape(){ // Destructor
 }
 
 
+void Cape::bindRigidBody(btRigidBody *body1, btRigidBody *body2) {
+
+	m_softBody->appendAnchor(0,body1);
+	m_softBody->appendAnchor(18,body2);
+	//m_softBody->appendAnchor(-(r-1),body);
+
+}
 
