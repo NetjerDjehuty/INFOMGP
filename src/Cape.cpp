@@ -1,11 +1,6 @@
 #include "Cape.h"
 #include "BulletSoftBody/btSoftBodyHelpers.h"
 
-#include <iostream>
-#include <fstream>
-#include <string>
-using namespace std;
-
 
 // CAPE
 
@@ -26,29 +21,14 @@ Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_
 		fixed,
 		true);
 	
-	
-	//psb->m_cfg.piterations = 10;
-	//psb->m_cfg.citerations = 10;
-	//psb->m_cfg.diterations = 10;
-
-	//psb->appendAnchor(0,body);
-	//psb->appendAnchor(-(r-1),body);
-
-
-	//psb->getCollisionShape()->setMargin(0.5);
-	btSoftBody::Material* pm=psb->appendMaterial();
-	pm->m_kLST		=	0.0004;
-	pm->m_flags		-=	btSoftBody::fMaterial::DebugDraw;
-	psb->generateBendingConstraints(2,pm);
 	psb->m_cfg.kLF			=	0.05;
 	psb->m_cfg.kDG			=	0.001;
-	//psb->m_cfg.kVC			=   1;
-	psb->m_cfg.kAHR = 1;
-	psb->m_cfg.kDF = 0;
-	psb->m_cfg.piterations = 10;
+	psb->m_cfg.kAHR         =   1;
+	psb->m_cfg.kDF          =   0;
+	psb->m_cfg.piterations  =   10;
 	
-	//psb->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
-	//psb->setWindVelocity(btVector3(0, 15, 15.0));
+	psb->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
+	psb->setWindVelocity(btVector3(0, 115, 125.0));
 	
 
 	btTransform		trs;
@@ -65,8 +45,6 @@ Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_
 
 	m_ownerWorld->addSoftBody(psb);
 	m_softBody = psb;
-
-	//cout << "add cape";
 }
 
 Cape::~Cape(){ // Destructor
@@ -81,7 +59,6 @@ void Cape::bindRigidBody(btRigidBody *body) {
 
 	m_softBody->appendAnchor(0,body);
 	m_softBody->appendAnchor(18,body);
-	//m_softBody->appendAnchor(-(r-1),body);
 
 }
 
