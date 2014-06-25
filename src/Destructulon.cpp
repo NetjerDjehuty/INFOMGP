@@ -25,13 +25,15 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	m_shapes[Destructulon::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.07), btScalar(0.40));
 	m_shapes[Destructulon::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
 	m_shapes[Destructulon::BODYPART_UPPER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.6));
-	m_shapes[Destructulon::BODYPART_UPPER_ARM]->setColor(btVector3(1,0,0));/*
-																		   m_shapes[Destructulon::BODYPART_LOWER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
-																		   m_shapes[Destructulon::BODYPART_LOWER_ARM]->setColor(btVector3(1,1,1));*/
+	m_shapes[Destructulon::BODYPART_UPPER_ARM]->setColor(btVector3(1,0,0));
+	/*
+	m_shapes[Destructulon::BODYPART_LOWER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
+	m_shapes[Destructulon::BODYPART_LOWER_ARM]->setColor(btVector3(1,1,1));*/
 	m_shapes[Destructulon::BODYPART_UPPER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.6));
-	m_shapes[Destructulon::BODYPART_UPPER_L_ARM]->setColor(btVector3(0,1,0));/*
-																			 m_shapes[Destructulon::BODYPART_LOWER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.3));
-																			 m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(1,1,1));*/
+	m_shapes[Destructulon::BODYPART_UPPER_L_ARM]->setColor(btVector3(0,1,0));
+	/*
+	m_shapes[Destructulon::BODYPART_LOWER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.3));
+	m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(1,1,1));*/
 	/*m_shapes[Destructulon::BODYPART_HEAD] = new btSphereShape(0.3);
 	m_shapes[Destructulon::BODYPART_HEAD]->setColor(btVector3(0.0,0.0,0.0));*/
 
