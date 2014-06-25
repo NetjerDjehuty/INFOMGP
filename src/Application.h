@@ -5,6 +5,7 @@
 //------------- include/declaration -------------
 #include "GlutDemoApplication.h"
 #include "Destructulon.h"
+#include "Environment.h"
 class btBroadphaseInterface;
 class btCollisionShape;
 class btCollisionDispatcher;
@@ -20,7 +21,7 @@ class Application : public GlutDemoApplication {
 
 public:
 
-	Application() : m_creature(NULL), m_destructulon(NULL), m_scene(NULL), m_elapsedTime(0) {}
+	Application() : m_creature(NULL), m_destructulon(NULL), m_scene(NULL), m_environment(NULL), m_elapsedTime(0) {}
 	virtual ~Application() {	exitPhysics(); } // Destructor
 
 	bool creatureCreated;
@@ -30,18 +31,20 @@ public:
 
 protected:
 
+	virtual void renderme();                    // Overwrite render function to draw soft bodies
 	virtual void clientMoveAndDisplay();		// Update the simulation
 	virtual void displayCallback();				// Render the simulation
-
-	virtual void keyboardCallback(unsigned char key, int x, int y); // Input management
+	virtual void keyboardCallback(unsigned char key, int x, int y); // Input management	
 
 	void resetScene(const btVector3& startOffset);	// Reset the creature
 	void update();									// Update objects and display the time elapsed under balance
+	void drawLine(btVector3& from, btVector3& to, const btVector3 &clr);  // Helper to draw soft bodies
 
 	Destructulon					*	m_destructulon;	// The first Destructulon
 	Destructulon					*	m_destructulon2;// The Second Destructulon
 	Creature						*	m_creature;		// The creature
 	Scene							*	m_scene;		// The scene
+	Environment                     *   m_environment;  // Environmental Forces
 	btCollisionShape				*	m_ground;		// The ground
 	btBroadphaseInterface			*	m_broadphase;	// The broadphase
 	btCollisionDispatcher			*	m_dispatcher;	// The displatcher

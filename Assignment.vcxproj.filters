@@ -26,6 +26,12 @@
     <ClInclude Include="src\Destructulon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Cape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Environment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -41,6 +47,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Destructulon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Cape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Environment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

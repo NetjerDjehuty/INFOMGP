@@ -10,8 +10,9 @@
 #define M_PI_2     1.57079632679489661923
 #define M_PI_4     0.785398163397448309616
 
-Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positionOffset) : m_ownerWorld (ownerWorld), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true)
+Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3& positionOffset, Environment* environment) : m_ownerWorld (ownerWorld), m_environment(environment), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true), m_positionOffset(positionOffset)
 {
+	this->m_cape = NULL;
 	this->m_ball = NULL;
 	this->opponent = NULL;
 	name = "Destructulon";
@@ -36,7 +37,7 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(1,1,1));*/
 	/*m_shapes[Destructulon::BODYPART_HEAD] = new btSphereShape(0.3);
 	m_shapes[Destructulon::BODYPART_HEAD]->setColor(btVector3(0.0,0.0,0.0));*/
-
+	
 #pragma endregion Setup the collision shapes
 
 	// Setup the body properties
@@ -60,7 +61,7 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.725), btScalar(0.0)));
 	m_bodies[Destructulon::BODYPART_UPPER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Destructulon::BODYPART_UPPER_LEG]);
-
+	
 	// UPPER_ARM
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(-0.1), btScalar(0.8), btScalar(0.0)));
@@ -211,6 +212,9 @@ Destructulon::Destructulon(btDynamicsWorld* ownerWorld, const btVector3& positio
 	*/
 
 #pragma endregion intialization of joints
+
+	// Initialize Cape
+	addCape();
 }
 
 Destructulon::~Destructulon(){ // Destructor
@@ -232,6 +236,8 @@ Destructulon::~Destructulon(){ // Destructor
 		delete m_COM; m_COM = NULL;
 		delete m_COMShape; m_COMShape = NULL;
 	}
+	// Delete Cape
+	removeCape();
 }
 
 void Destructulon::switchCOM() {
@@ -258,6 +264,9 @@ void Destructulon::switchCOM() {
 
 void Destructulon::update(int elapsedTime) {
 
+	// update cape
+	if(m_cape != NULL)
+		m_cape->update();
 
 	// BALANCE CONTROLLER
 	// ==================
@@ -438,4 +447,20 @@ btVector3 Destructulon::computeCenterOfMass() {
 	return ret/totMass;
 	//===========================================//
 
+}
+
+
+// Toggle/Add/Remove this creature's cape
+void Destructulon::toggleCape() {
+	m_cape == NULL ? addCape() : removeCape();
+}
+void Destructulon::addCape() {
+	if (m_cape != NULL) return;
+	m_cape = new Cape(m_ownerWorld, m_environment, m_positionOffset);
+	m_cape->bindRigidBody(m_bodies[Destructulon::BODYPART_UPPER_LEG]);
+}
+void Destructulon::removeCape() {
+	if(m_cape == NULL) return;
+	delete m_cape;
+	m_cape = NULL;
 }
