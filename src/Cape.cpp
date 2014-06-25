@@ -36,16 +36,16 @@ Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_
 
 
 	//psb->getCollisionShape()->setMargin(0.5);
-	//btSoftBody::Material* pm=psb->appendMaterial();
-	//pm->m_kLST		=	0.0004;
-	//pm->m_flags		-=	btSoftBody::fMaterial::DebugDraw;
-	//psb->generateBendingConstraints(2,pm);
+	btSoftBody::Material* pm=psb->appendMaterial();
+	pm->m_kLST		=	0.0004;
+	pm->m_flags		-=	btSoftBody::fMaterial::DebugDraw;
+	psb->generateBendingConstraints(2,pm);
 	//psb->m_cfg.kLF			=	0.05;
-	//psb->m_cfg.kDG			=	0.01;
+	psb->m_cfg.kDG			=	0.001;
 	psb->m_cfg.piterations = 10;
-	//	psb->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
 	
-	//psb->setWindVelocity(btVector3(4, -10, -25.0));
+	psb->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
+	psb->setWindVelocity(btVector3(0, 15, 15.0));
 	
 
 	btTransform		trs;
@@ -56,7 +56,7 @@ Cape::Cape (btSoftRigidDynamicsWorld* ownerWorld, Environment *environment) : m_
 	trs.setOrigin(pos);
 	trs.setRotation(rot);
 	psb->transform(trs);
-	psb->setTotalMass(0.000001);
+	psb->setTotalMass(0.001);
 
 
 	m_ownerWorld->addSoftBody(psb);
