@@ -256,6 +256,11 @@ void Application::keyboardCallback(unsigned char key, int x, int y) {
 			if(m_destructulon2 != NULL) m_destructulon2->toggleCape();
 			break;
 		}
+	case 'w':
+		{
+			// toggle wind
+			m_environment->windOn = !m_environment->windOn;
+		}
 	default :
 		DemoApplication::keyboardCallback(key, x, y);
 	}	

@@ -17,6 +17,7 @@ public:
     
 	btSoftBodyWorldInfo	m_softBodyWorldInfo;  // Holding environment configuration
 	btVector3 m_windVelocity;                 // Holding wind strength and direction
+	bool windOn;						      // Toggles wind
 
 protected:
 	btDynamicsWorld		*	m_ownerWorld;				// The physics world of the simulation

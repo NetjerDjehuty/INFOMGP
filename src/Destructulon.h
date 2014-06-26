@@ -11,7 +11,6 @@ class Destructulon
 {
 public:
 	Destructulon (btSoftRigidDynamicsWorld* ownerWorld, const btVector3& positionOffset, Environment *environment); // Constructor
-
 	virtual	~Destructulon(); // Destructor
 
 	void update(int elapsedTime);		// Update the creature state
@@ -22,9 +21,10 @@ public:
 	bool firstLoop;						// To start with arms facing downwards
 	btRigidBody*	m_ball;				// Ball
 	Destructulon*	opponent;			// Ball
+	bool cape;							// Boolean for cape
 
 	btVector3 getCOM() {return m_positionCOM;}	// Return the position of the COM
-	void toggleCape();					// Change visibility of the cape
+	void toggleCape();							// Change visibility of the cape
 
 public:
 
@@ -41,6 +41,7 @@ public:
 	Cape					 *  m_cape;                     // Destructolon wears a cape 
 
 	int lastChange;										// Time of last change of balance controller
+	int lastChangeFight;
 
 	bool	m_hasFallen;		// Indicates if the creature has already fallen down
 

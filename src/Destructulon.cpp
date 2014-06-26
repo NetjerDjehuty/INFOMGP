@@ -10,7 +10,7 @@
 #define M_PI_2     1.57079632679489661923
 #define M_PI_4     0.785398163397448309616
 
-Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3& positionOffset, Environment* environment) : m_ownerWorld (ownerWorld), m_environment(environment), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true), m_positionOffset(positionOffset)
+Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3& positionOffset, Environment* environment) : m_ownerWorld(ownerWorld), m_environment(environment), m_hasFallen(false), lastChange(0), m_showCOM(false), firstLoop(true), m_positionOffset(positionOffset)
 {
 	this->m_cape = NULL;
 	this->m_ball = NULL;
@@ -19,25 +19,25 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 
 #pragma region
 
-	m_shapes[Destructulon::BODYPART_FOOT] = new btBoxShape(btVector3(btScalar(0.1),btScalar(0.025),btScalar(0.12)));
-	m_shapes[Destructulon::BODYPART_FOOT]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
+	m_shapes[Destructulon::BODYPART_FOOT] = new btBoxShape(btVector3(btScalar(0.1), btScalar(0.025), btScalar(0.12)));
+	m_shapes[Destructulon::BODYPART_FOOT]->setColor(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
 	m_shapes[Destructulon::BODYPART_LOWER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.50));
-	m_shapes[Destructulon::BODYPART_LOWER_LEG]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
+	m_shapes[Destructulon::BODYPART_LOWER_LEG]->setColor(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
 	m_shapes[Destructulon::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.07), btScalar(0.40));
-	m_shapes[Destructulon::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.0),btScalar(0.0),btScalar(0.0)));
+	m_shapes[Destructulon::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0)));
 	m_shapes[Destructulon::BODYPART_UPPER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.6));
-	m_shapes[Destructulon::BODYPART_UPPER_ARM]->setColor(btVector3(1,0,0));
+	m_shapes[Destructulon::BODYPART_UPPER_ARM]->setColor(btVector3(1, 0, 0));
 	/*
 	m_shapes[Destructulon::BODYPART_LOWER_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.30));
 	m_shapes[Destructulon::BODYPART_LOWER_ARM]->setColor(btVector3(1,1,1));*/
 	m_shapes[Destructulon::BODYPART_UPPER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.6));
-	m_shapes[Destructulon::BODYPART_UPPER_L_ARM]->setColor(btVector3(0,1,0));
+	m_shapes[Destructulon::BODYPART_UPPER_L_ARM]->setColor(btVector3(0, 1, 0));
 	/*
 	m_shapes[Destructulon::BODYPART_LOWER_L_ARM] = new btCapsuleShape(btScalar(0.03), btScalar(0.3));
 	m_shapes[Destructulon::BODYPART_LOWER_L_ARM]->setColor(btVector3(1,1,1));*/
 	/*m_shapes[Destructulon::BODYPART_HEAD] = new btSphereShape(0.3);
 	m_shapes[Destructulon::BODYPART_HEAD]->setColor(btVector3(0.0,0.0,0.0));*/
-	
+
 #pragma endregion Setup the collision shapes
 
 	// Setup the body properties
@@ -61,7 +61,7 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.725), btScalar(0.0)));
 	m_bodies[Destructulon::BODYPART_UPPER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Destructulon::BODYPART_UPPER_LEG]);
-	
+
 	// UPPER_ARM
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(-0.1), btScalar(0.8), btScalar(0.0)));
@@ -115,12 +115,12 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 
 	// ANKLE
 	localA.setIdentity(); localB.setIdentity();
-	localA.getBasis().setEulerZYX(0,btScalar(M_PI_2),0); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.025), btScalar(0.0)));
-	localB.getBasis().setEulerZYX(0,btScalar(M_PI_2),0); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.25), btScalar(0.0)));
-	hingeJoint =  new btHingeConstraint(*m_bodies[Destructulon::BODYPART_FOOT], *m_bodies[Destructulon::BODYPART_LOWER_LEG], localA, localB);
+	localA.getBasis().setEulerZYX(0, btScalar(M_PI_2), 0); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.025), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0, btScalar(M_PI_2), 0); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.25), btScalar(0.0)));
+	hingeJoint = new btHingeConstraint(*m_bodies[Destructulon::BODYPART_FOOT], *m_bodies[Destructulon::BODYPART_LOWER_LEG], localA, localB);
 	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
 
-	hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+	hingeJoint->enableAngularMotor(true, btScalar(0.0), btScalar(50.0)); //uncomment to allow for torque control
 
 	m_joints[Destructulon::JOINT_ANKLE] = hingeJoint;
 	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -128,12 +128,12 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 
 	// KNEE
 	localA.setIdentity(); localB.setIdentity();
-	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.25), btScalar(0.0)));
-	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.20), btScalar(0.0)));
+	localA.getBasis().setEulerZYX(0, 0, btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.25), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0, 0, btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.20), btScalar(0.0)));
 	hingeJoint = new btHingeConstraint(*m_bodies[Destructulon::BODYPART_LOWER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_LEG], localA, localB);
 	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
 
-	hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+	hingeJoint->enableAngularMotor(true, btScalar(0.0), btScalar(50.0)); //uncomment to allow for torque control
 
 	m_joints[Destructulon::JOINT_KNEE] = hingeJoint;
 	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -146,14 +146,14 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 
 	// SHOULDER
 	localA.setIdentity(); localB.setIdentity();
-	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(-0.075), btScalar(.15), btScalar(0.0)));
-	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.3), btScalar(0.0)));
+	localA.getBasis().setEulerZYX(0, 0, btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(-0.075), btScalar(.15), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0, 0, btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.3), btScalar(0.0)));
 	//old stuff: socketJoint = new btPoint2PointConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_ARM], btVector3(-.06,0.09,0.0), btVector3(0.0,0.0,0.0));
 	socketJoint = new btConeTwistConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_ARM], localA, localB);
 
-	socketJoint ->enableMotor(true);
-	socketJoint ->setLimit(M_PI_2, M_PI_2, 0);
-	socketJoint ->setMaxMotorImpulse(btScalar(50.0));
+	socketJoint->enableMotor(true);
+	socketJoint->setLimit(M_PI_2, M_PI_2, 0);
+	socketJoint->setMaxMotorImpulse(btScalar(50.0));
 
 	m_joints[Destructulon::JOINT_SHOULDER] = socketJoint;
 	socketJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -175,14 +175,14 @@ Destructulon::Destructulon(btSoftRigidDynamicsWorld* ownerWorld, const btVector3
 
 	// SHOULDER_L
 	localA.setIdentity(); localB.setIdentity();
-	localA.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.075), btScalar(.15), btScalar(0.0)));
-	localB.getBasis().setEulerZYX(0,0,btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.3), btScalar(0.0)));
+	localA.getBasis().setEulerZYX(0, 0, btScalar(M_PI_2)); localA.setOrigin(btVector3(btScalar(0.075), btScalar(.15), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0, 0, btScalar(M_PI_2)); localB.setOrigin(btVector3(btScalar(0.0), btScalar(0.3), btScalar(0.0)));
 	socketJoint = new btConeTwistConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_L_ARM], localA, localB);
 	//old stuff: socketJoint = new btPoint2PointConstraint(*m_bodies[BODYPART_UPPER_LEG], *m_bodies[Destructulon::BODYPART_UPPER_L_ARM], btVector3(0.06,.09,0.0), btVector3(0.0,0.0,0.0));
 
-	socketJoint ->enableMotor(true);
+	socketJoint->enableMotor(true);
 	socketJoint->setLimit(M_PI_2, M_PI_2, 0);
-	socketJoint ->setMaxMotorImpulse(btScalar(50.0));
+	socketJoint->setMaxMotorImpulse(btScalar(50.0));
 
 	m_joints[Destructulon::JOINT_L_SHOULDER] = socketJoint;
 	socketJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -222,10 +222,10 @@ Destructulon::~Destructulon(){ // Destructor
 	for (int i = 0; i < Destructulon::JOINT_COUNT; ++i) {
 		m_ownerWorld->removeConstraint(m_joints[i]);
 		delete m_joints[i]; m_joints[i] = NULL;
-	}		
+	}
 	// Remove all bodies and shapes
 	for (int i = 0; i < Destructulon::BODYPART_COUNT; ++i) {
-		m_ownerWorld->removeRigidBody(m_bodies[i]);			
+		m_ownerWorld->removeRigidBody(m_bodies[i]);
 		delete m_bodies[i]->getMotionState();
 		delete m_bodies[i]; m_bodies[i] = NULL;
 		delete m_shapes[i]; m_shapes[i] = NULL;
@@ -245,7 +245,7 @@ void Destructulon::switchCOM() {
 	if (m_showCOM) {
 		// Shape
 		m_COMShape = new btSphereShape(btScalar(0.05));
-		m_COMShape->setColor(btVector3(btScalar(0.6),btScalar(1.0),btScalar(0.6)));
+		m_COMShape->setColor(btVector3(btScalar(0.6), btScalar(1.0), btScalar(0.6)));
 		// Body
 		btTransform transform;
 		transform.setIdentity();
@@ -258,14 +258,14 @@ void Destructulon::switchCOM() {
 		m_ownerWorld->removeRigidBody(m_COM);
 		delete m_COM->getMotionState();
 		delete m_COM; m_COM = NULL;
-		delete m_COMShape; m_COMShape = NULL;	
-	}	
+		delete m_COMShape; m_COMShape = NULL;
+	}
 }
 
 void Destructulon::update(int elapsedTime) {
 
 	// update cape
-	if(m_cape != NULL)
+	if (m_cape != NULL)
 		m_cape->update();
 
 	// BALANCE CONTROLLER
@@ -285,7 +285,7 @@ void Destructulon::update(int elapsedTime) {
 	if (m_hasFallen) {
 		if (((btHingeConstraint*)m_joints[Destructulon::JOINT_ANKLE])->getEnableAngularMotor()) { // ragdoll is fallen
 
-			for(int i = 0; i < Destructulon::JOINT_COUNT; i++)
+			for (int i = 0; i < Destructulon::JOINT_COUNT; i++)
 			{
 				m_joints[i]->setEnabled(false);
 			}
@@ -295,7 +295,7 @@ void Destructulon::update(int elapsedTime) {
 			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->enableMotor(false);
 		}
 		return;
-	}			
+	}
 
 	if (elapsedTime - lastChange > 10) { // Update balance control only every 10 ms
 		lastChange = elapsedTime;
@@ -307,27 +307,27 @@ void Destructulon::update(int elapsedTime) {
 		btTransform trFoot = m_bodies[Destructulon::BODYPART_FOOT]->getWorldTransform();
 		btQuaternion fRot = trFoot.getRotation();
 		btScalar mag = sqrt(fRot.w()*fRot.w() + fRot.y()*fRot.y());
-		btScalar yaw = 2*acos(fRot.w()/mag); //... I think...
+		btScalar yaw = 2 * acos(fRot.w() / mag); //... I think...
 
 		btTransform yawRot; yawRot.setIdentity();
-		yawRot.setRotation(btQuaternion(yaw,0,0));
+		yawRot.setRotation(btQuaternion(yaw, 0, 0));
 		yawRot = yawRot.inverse();
 
 		COM = yawRot * COM;
 		COA = yawRot * COA;
 
-		((btHingeConstraint*)m_joints[Destructulon::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() - COA.z() ) * 20.0f );
-		((btHingeConstraint*)m_joints[Destructulon::JOINT_KNEE])->setMotorTarget( btScalar( COA.x() - COM.x() ) * 25.0f );
+		((btHingeConstraint*)m_joints[Destructulon::JOINT_ANKLE])->setMotorTarget(btScalar(COM.z() - COA.z()) * 20.0f);
+		((btHingeConstraint*)m_joints[Destructulon::JOINT_KNEE])->setMotorTarget(btScalar(COA.x() - COM.x()) * 25.0f);
 
-		if(firstLoop)
+		if (firstLoop)
 		{
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget( btQuaternion( btScalar(0.0),  btScalar( COA.z() - COM.z() ) * 10.0f ,  btScalar( COA.x() - COM.x() ) * 15.0f )); // last one: positive is right, negative left
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget( btQuaternion( btScalar(0.0) ,  btScalar( COM.z() - COA.z() ) * 10.0f ,  btScalar( COM.x() - COA.x() ) * 15.0f ));
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMotorTarget(btQuaternion(btScalar(0.0), btScalar(COA.z() - COM.z()) * 10.0f, btScalar(COA.x() - COM.x()) * 15.0f)); // last one: positive is right, negative left
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMotorTarget(btQuaternion(btScalar(0.0), btScalar(COM.z() - COA.z()) * 10.0f, btScalar(COM.x() - COA.x()) * 15.0f));
 			firstLoop = false;
 		}
 
 #pragma region
-		if(this->opponent != NULL)
+		if (this->opponent != NULL)
 		{
 			btVector3 opponentPos = this->opponent->m_bodies[BODYPART_UPPER_LEG]->getCenterOfMassPosition();
 			btVector3 up = btVector3(0, 0.3, 0);
@@ -335,9 +335,9 @@ void Destructulon::update(int elapsedTime) {
 			btVector3 shoulder = armOrient * up;
 
 			btVector3 shoulderToOpponent = (shoulder - opponentPos).normalize();
-			btVector3 shoulderToArm =  btVector3(0,1,0);
+			btVector3 shoulderToArm = btVector3(0, 1, 0);
 
-			btVector3 temp = btCross(shoulderToOpponent,shoulderToArm);
+			btVector3 temp = btCross(shoulderToOpponent, shoulderToArm);
 
 			btScalar w = sqrt((shoulderToOpponent.length() * shoulderToOpponent.length()) * (shoulderToArm.length() * shoulderToArm.length())) + btDot(shoulderToArm, shoulderToOpponent);
 
@@ -345,19 +345,35 @@ void Destructulon::update(int elapsedTime) {
 			//Quat = Quat * bTrans.getRotation();
 			Quat = Quat.normalize();
 
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat);
-			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
-			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat);
-			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+			Quat = shortestArcQuatNormalize2(shoulderToOpponent, shoulderToArm);
+
+			if (opponent->hasFallen())
+			{
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMotorTarget(btQuaternion(0, 0, 1, 0).normalize());
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMotorTarget(btQuaternion(0, 0, 1, 0).normalize());
+			}
+			else if (elapsedTime - lastChangeFight > 500 && elapsedTime - lastChangeFight < 1000) {
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMotorTarget(Quat);
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMotorTarget(btQuaternion(0, 0, -1, 1).normalize());
+			}
+			else if (elapsedTime - lastChangeFight > 1000){
+				lastChangeFight = elapsedTime;
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMotorTarget(btQuaternion(0, 0, 1, 1).normalize());
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMotorTarget(Quat);
+			}
+
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+
 		}
 #pragma endregion  BATTLE!
 
 #pragma region
-		if(this->m_ball != NULL)
+		if (this->m_ball != NULL)
 		{
 			btVector3 ballPos = this->m_ball->getCenterOfMassPosition();
 			btScalar threshold = 3;
-			if(ballPos.distance2(m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition()) < threshold)
+			if (ballPos.distance2(m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition()) < threshold)
 			{
 				btVector3 ballPos = this->m_ball->getCenterOfMassPosition();
 				btVector3 arm = this->m_bodies[BODYPART_UPPER_ARM]->getCenterOfMassPosition();
@@ -370,26 +386,26 @@ void Destructulon::update(int elapsedTime) {
 
 				btVector3 temp = btCross(shoulderToBall, shoulderToArm);
 
-				btScalar w = sqrt((shoulderToBall.length() * shoulderToBall.length()) * (shoulderToArm.length() * shoulderToArm.length())) + btDot(shoulderToBall,shoulderToArm);
+				btScalar w = sqrt((shoulderToBall.length() * shoulderToBall.length()) * (shoulderToArm.length() * shoulderToArm.length())) + btDot(shoulderToBall, shoulderToArm);
 
 
 				btQuaternion Quat = btQuaternion(temp.getX(), temp.getY(), temp.getZ(), w);
 
-				if(temp.getZ() > -.1)
+				if (temp.getZ() > -.1)
 				{
-					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat.normalize());
+					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMotorTarget(Quat.normalize());
 					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
 				}
-				else if(temp.getZ() < 0.1)
+				else if (temp.getZ() < 0.1)
 				{
-					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat.normalize());
+					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMotorTarget(Quat.normalize());
 					((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
 				}
 			}
 			else
 			{
-				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget( btQuaternion( btScalar(0.0),  btScalar( COA.z() - COM.z() ) * 10.0f ,  btScalar( COA.x() - COM.x() ) * 15.0f )); // last one: positive is right, negative left
-				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget( btQuaternion( btScalar(0.0) ,  btScalar( COM.z() - COA.z() ) * 10.0f ,  btScalar( COM.x() - COA.x() ) * 15.0f ));
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMotorTarget(btQuaternion(btScalar(0.0), btScalar(COA.z() - COM.z()) * 10.0f, btScalar(COA.x() - COM.x()) * 15.0f)); // last one: positive is right, negative left
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMotorTarget(btQuaternion(btScalar(0.0), btScalar(COM.z() - COA.z()) * 10.0f, btScalar(COM.x() - COA.x()) * 15.0f));
 			}
 		}
 #pragma endregion BALL SLAPPER
@@ -434,17 +450,17 @@ bool Destructulon::hasFallen() {
 
 btVector3 Destructulon::computeCenterOfMass() {
 
-	btVector3 ret(0,0,0);
+	btVector3 ret(0, 0, 0);
 	float totMass = 0.0f;
 
 	for (int i = 0; i < BODYPART_COUNT; i++)
 	{
-		totMass += (1.0f/m_bodies[i]->getInvMass());
-		ret +=	m_bodies[i]->getCenterOfMassPosition() / m_bodies[i]->getInvMass();
+		totMass += (1.0f / m_bodies[i]->getInvMass());
+		ret += m_bodies[i]->getCenterOfMassPosition() / m_bodies[i]->getInvMass();
 	}
 
 	//=================== TODO ==================//
-	return ret/totMass;
+	return ret / totMass;
 	//===========================================//
 
 }
@@ -460,7 +476,7 @@ void Destructulon::addCape() {
 	m_cape->bindRigidBody(m_bodies[Destructulon::BODYPART_UPPER_LEG]);
 }
 void Destructulon::removeCape() {
-	if(m_cape == NULL) return;
+	if (m_cape == NULL) return;
 	delete m_cape;
 	m_cape = NULL;
 }
