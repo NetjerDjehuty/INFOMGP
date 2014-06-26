@@ -347,7 +347,7 @@ void Destructulon::update(int elapsedTime) {
 
 			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat);
 			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
-			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat);
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat);
 			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
 		}
 #pragma endregion  BATTLE!
