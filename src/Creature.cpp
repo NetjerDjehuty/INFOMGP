@@ -71,7 +71,7 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
 
 	hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
-	hingeJoint->setBreakingImpulseThreshold(2.5f);
+	hingeJoint->setBreakingImpulseThreshold(5.0f);
 
 	m_joints[Creature::JOINT_ANKLE] = hingeJoint;
 	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -88,7 +88,7 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
 
 	hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
-	hingeJoint->setBreakingImpulseThreshold(2.5f);
+	hingeJoint->setBreakingImpulseThreshold(5.0f);
 
 	m_joints[Creature::JOINT_KNEE] = hingeJoint;
 	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
