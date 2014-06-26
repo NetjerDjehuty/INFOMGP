@@ -41,6 +41,7 @@ public:
 	Cape					 *  m_cape;                     // Destructolon wears a cape 
 
 	int lastChange;										// Time of last change of balance controller
+	int lastChangeFight;
 
 	bool	m_hasFallen;		// Indicates if the creature has already fallen down
 

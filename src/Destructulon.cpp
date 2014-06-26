@@ -345,10 +345,19 @@ void Destructulon::update(int elapsedTime) {
 			//Quat = Quat * bTrans.getRotation();
 			Quat = Quat.normalize();
 
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat);
-			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
-			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat);
-			//((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+
+			if (elapsedTime - lastChangeFight > 500 && elapsedTime - lastChangeFight < 1000) {
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(Quat);
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(btQuaternion(0, 0, -1, 1).normalize());
+			} else if (elapsedTime - lastChangeFight > 1000){
+				lastChangeFight = elapsedTime;
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])-> setMotorTarget(btQuaternion(0, 0, 1, 1).normalize());
+				((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])-> setMotorTarget(Quat);
+			}
+			
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+			((btConeTwistConstraint*)m_joints[Destructulon::JOINT_L_SHOULDER])->setMaxMotorImpulse(btScalar(90));
+
 		}
 #pragma endregion  BATTLE!
 
