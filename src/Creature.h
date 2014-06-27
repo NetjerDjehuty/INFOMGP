@@ -3,6 +3,11 @@
 
 #include "btBulletDynamicsCommon.h"
 
+
+#define	GAINSP 10.0f
+#define GAINSD 100.0f
+//#define EXTRAPARTS
+
 class Creature {
 
 public:
@@ -22,9 +27,13 @@ public:
 
 public:
 
+#ifdef EXTRAPARTS
+	enum Part {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG, BODYPART_HEAD, BODYPART_HEAD2,BODYPART_COUNT}; // Body parts of the creature
+	enum Joint {JOINT_ANKLE,JOINT_KNEE, JOINT_NECK, JOINT_NECK2, JOINT_COUNT}; // Joints of the creature
+#else
 	enum Part {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG,BODYPART_COUNT}; // Body parts of the creature
-
-	enum Joint {JOINT_ANKLE,JOINT_KNEE,JOINT_COUNT}; // Joints of the creature
+	enum Joint {JOINT_ANKLE,JOINT_KNEE, JOINT_COUNT}; // Joints of the creature
+#endif
 
 	btDynamicsWorld		*	m_ownerWorld;				// The physics world of the simulation
 	btCollisionShape	*	m_shapes[BODYPART_COUNT];	// The primitive shape of each body part used in collision

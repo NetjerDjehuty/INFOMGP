@@ -29,6 +29,13 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 	m_shapes[Creature::BODYPART_LOWER_LEG]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
 	m_shapes[Creature::BODYPART_UPPER_LEG] = new btCapsuleShape(btScalar(0.05), btScalar(0.40));
 	m_shapes[Creature::BODYPART_UPPER_LEG]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
+	
+#ifdef EXTRAPARTS
+	m_shapes[Creature::BODYPART_HEAD] = new btCapsuleShape(btScalar(0.05), btScalar(0.20));
+	m_shapes[Creature::BODYPART_HEAD]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
+	m_shapes[Creature::BODYPART_HEAD2] = new btCapsuleShape(btScalar(0.05), btScalar(0.20));
+	m_shapes[Creature::BODYPART_HEAD2]->setColor(btVector3(btScalar(0.6),btScalar(0.6),btScalar(0.6)));
+#endif
 
 	// Setup the body properties
 	btTransform offset; offset.setIdentity();
@@ -49,6 +56,17 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 	transform.setIdentity();
 	transform.setOrigin(btVector3(btScalar(0.0), btScalar(0.725), btScalar(0.0)));
 	m_bodies[Creature::BODYPART_UPPER_LEG] = m_ownerWorld->localCreateRigidBody(btScalar(3.0), offset*transform, m_shapes[Creature::BODYPART_UPPER_LEG]);
+
+#ifdef EXTRAPARTS
+	// HEAD
+	transform.setIdentity();
+	transform.setOrigin(btVector3(btScalar(0.0), btScalar(1.025), btScalar(0.0)));
+	m_bodies[Creature::BODYPART_HEAD] = m_ownerWorld->localCreateRigidBody(btScalar(0.5), offset*transform, m_shapes[Creature::BODYPART_HEAD]);
+	// HEAD2
+	transform.setIdentity();
+	transform.setOrigin(btVector3(btScalar(0.0), btScalar(1.225), btScalar(0.0)));
+	m_bodies[Creature::BODYPART_HEAD2] = m_ownerWorld->localCreateRigidBody(btScalar(0.5), offset*transform, m_shapes[Creature::BODYPART_HEAD2]);
+#endif
 
 	// Add damping to the rigid bodies
 	for (int i = 0; i < Creature::BODYPART_COUNT; ++i) {
@@ -96,6 +114,37 @@ Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset
 	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 	m_ownerWorld->addConstraint(m_joints[JOINT_KNEE], true);
 
+#ifdef EXTRAPARTS
+	// HEAD
+	localA.setIdentity(); localB.setIdentity();
+	
+	localA.getBasis().setEulerZYX(0,btScalar(M_PI_2),0); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.20), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0,btScalar(M_PI_2),0); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.10), btScalar(0.0)));
+	hingeJoint = new btHingeConstraint(*m_bodies[Creature::BODYPART_UPPER_LEG], *m_bodies[Creature::BODYPART_HEAD], localA, localB);
+	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
+
+	hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+	hingeJoint->setBreakingImpulseThreshold(5.0f);
+
+	m_joints[Creature::JOINT_NECK] = hingeJoint;
+	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
+	m_ownerWorld->addConstraint(m_joints[JOINT_NECK], true);
+
+	// HEAD2
+	localA.setIdentity(); localB.setIdentity();
+	
+	localA.getBasis().setEulerZYX(0,0,0); localA.setOrigin(btVector3(btScalar(0.0), btScalar(0.10), btScalar(0.0)));
+	localB.getBasis().setEulerZYX(0,0,0); localB.setOrigin(btVector3(btScalar(0.0), btScalar(-0.10), btScalar(0.0)));
+	hingeJoint = new btHingeConstraint(*m_bodies[Creature::BODYPART_HEAD], *m_bodies[Creature::BODYPART_HEAD2], localA, localB);
+	hingeJoint->setLimit(btScalar(-M_PI_2), btScalar(M_PI_2));
+
+	hingeJoint->enableAngularMotor(true,btScalar(0.0),btScalar(50.0)); //uncomment to allow for torque control
+	hingeJoint->setBreakingImpulseThreshold(5.0f);
+
+	m_joints[Creature::JOINT_NECK2] = hingeJoint;
+	hingeJoint->setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
+	m_ownerWorld->addConstraint(m_joints[JOINT_NECK2], true);
+#endif
 }
 
 Creature::~Creature() { // Destructor
@@ -180,7 +229,9 @@ void Creature::update(int elapsedTime) {
 		return;
 	}			
 
-	if (elapsedTime - lastChange > 10) { // Update balance control only every 10 ms
+	float dt = elapsedTime - lastChange;
+
+	if (dt > 10) { // Update balance control only every 10 ms
 		lastChange = elapsedTime;
 
 		btVector3 cPoly = m_bodies[BODYPART_FOOT]->getWorldTransform() * btVector3(0.0f, -0.025f, 0.0f);
@@ -201,19 +252,17 @@ void Creature::update(int elapsedTime) {
 			bodyRot.setOrigin(btVector3(0,0,0));
 
 			btVector3 gravityDirection = (bodyRot * btVector3(0, -1, 0)).normalize();
-			btVector3 comTotal = bodySpace * computeCenterOfMass((Part)(i+1));
-			btVector3 csp = -((comTotal - jointSpace.getOrigin())-(bodySpace * cPoly));
+			btVector3 upperCOM = bodySpace * computeCenterOfMass((Part)(i+1));
+			btVector3 csp = -((upperCOM - jointSpace.getOrigin())-(bodySpace * cPoly));
 			btVector3 projOnCSP = csp - (csp.dot(gravityDirection) * gravityDirection);
 
 			btTransform jointRot = jointSpace;
 			jointRot.setOrigin(btVector3(0,0,0));
-			btVector3 errorAxis = jointRot * btVector3(1,0,0);
+			btVector3 turnAxis = jointRot * btVector3(0,0,1);
+			btVector3 errorAxis = (turnAxis.cross(gravityDirection)).normalize();
 			btScalar error = projOnCSP.dot(errorAxis);
-			btScalar errorDiff = (error - prevError[i]) / (float)elapsedTime;
-
-#define	GAINSP 15.0f
-#define GAINSD 20.0f
-
+			btScalar errorDiff = (error - prevError[i]) / dt;
+			
 			currentJoint->setMotorTarget( (error * GAINSP + errorDiff * GAINSD) ); 
 
 			prevError[i] = error;
