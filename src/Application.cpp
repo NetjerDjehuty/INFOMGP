@@ -363,7 +363,7 @@ void Application::update() {
 
 	// Display info
 	DemoApplication::displayProfileString(10,20,"Q=quit E=reset R=platform T=ball Y=COM U=switch I=pause");
-	DemoApplication::displayProfileString(10,40,"A=Creature D=destructulon F=fight C=canon P=cape");
+	DemoApplication::displayProfileString(10,40,"A=Creature D=destructulon F=fight C=canon P=cape W=wind");
 
 
 	// Display time elapsed
