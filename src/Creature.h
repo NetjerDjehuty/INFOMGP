@@ -6,7 +6,23 @@
 
 #define	GAINSP 10.0f
 #define GAINSD 100.0f
-//#define EXTRAPARTS
+
+#define EXTRAPARTS 4
+#define EXTRAPARTSLENGTH 0.1f
+#define EXTRAPARTSWEIGHT 0.5f
+
+
+
+
+
+#define BODYPART_FOOT 0
+#define BODYPART_LOWER_LEG 1
+#define BODYPART_UPPER_LEG 2
+#define BODYPART_COUNT (3 + EXTRAPARTS)
+
+#define JOINT_ANKLE 0
+#define JOINT_KNEE 1
+#define JOINT_COUNT (2 + EXTRAPARTS)
 
 class Creature {
 
@@ -27,14 +43,6 @@ public:
 
 public:
 
-#ifdef EXTRAPARTS
-	enum Part {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG, BODYPART_HEAD, BODYPART_HEAD2,BODYPART_COUNT}; // Body parts of the creature
-	enum Joint {JOINT_ANKLE,JOINT_KNEE, JOINT_NECK, JOINT_NECK2, JOINT_COUNT}; // Joints of the creature
-#else
-	enum Part {BODYPART_FOOT,BODYPART_LOWER_LEG,BODYPART_UPPER_LEG,BODYPART_COUNT}; // Body parts of the creature
-	enum Joint {JOINT_ANKLE,JOINT_KNEE, JOINT_COUNT}; // Joints of the creature
-#endif
-
 	btDynamicsWorld		*	m_ownerWorld;				// The physics world of the simulation
 	btCollisionShape	*	m_shapes[BODYPART_COUNT];	// The primitive shape of each body part used in collision
 	btRigidBody			*	m_bodies[BODYPART_COUNT];	// The array of body parts
@@ -47,14 +55,14 @@ public:
 	btCollisionShape	*	m_COMShape;		// Shape for COM
 	btRigidBody			*	m_COM;			// Body COM
 	btVector3				m_positionCOM;	// Position COM
-	btVector3				computeCenterOfMass(Part from = (Part)0);		// Compute the COM of the creature in world coordinate system from the given part up
-	float					computeTotalMass(Part from = (Part)0);		// Compute the mass of the creature in world coordinate system from the given part up
+	btVector3				computeCenterOfMass(int from = 0);		// Compute the COM of the creature in world coordinate system from the given part up
+	float					computeTotalMass(int from = 0);		// Compute the mass of the creature in world coordinate system from the given part up
 
-	btVector3				computeCenterOfMassBelow(Part to);		// Compute the COM of the creature in world coordinate system from the given part up
-	float					computeTotalMassBelow(Part to);		// Compute the mass of the creature in world coordinate system from the given part up
+	btVector3				computeCenterOfMassBelow(int to);		// Compute the COM of the creature in world coordinate system from the given part up
+	float					computeTotalMassBelow(int to);		// Compute the mass of the creature in world coordinate system from the given part up
 
 private:
-	btScalar				prevError[JOINT_COUNT];
+	btScalar				prevError[BODYPART_COUNT];
 };
 
 #endif

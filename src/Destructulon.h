@@ -2,7 +2,7 @@
 #ifndef DESTRUCTULON_H
 #define DESTRUCTULON_H
 
-#include "Creature.h"
+//#include "Creature.h"
 #include "Environment.h"
 #include "Cape.h"
 #include "btBulletDynamicsCommon.h"
