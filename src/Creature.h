@@ -44,6 +44,8 @@ public:
 	btVector3				computeCenterOfMassBelow(Part to);		// Compute the COM of the creature in world coordinate system from the given part up
 	float					computeTotalMassBelow(Part to);		// Compute the mass of the creature in world coordinate system from the given part up
 
+private:
+	btScalar				prevError[JOINT_COUNT];
 };
 
 #endif

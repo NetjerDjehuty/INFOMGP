@@ -15,6 +15,8 @@ Creature::Creature(){};
 
 Creature::Creature (btDynamicsWorld* ownerWorld, const btVector3& positionOffset) : m_ownerWorld (ownerWorld), m_hasFallen(false), lastChange(0), m_showCOM(false) { // Constructor
 
+	for (int i = 0; i < Creature::JOINT_COUNT; i++)
+		prevError[i] = 0.0f;
 	name = "Creature";
 
 	// Setup the rigid bodies
@@ -181,17 +183,8 @@ void Creature::update(int elapsedTime) {
 	if (elapsedTime - lastChange > 10) { // Update balance control only every 10 ms
 		lastChange = elapsedTime;
 
-		//btVector3 comFoot = m_bodies[BODYPART_FOOT]->getCenterOfMassPosition();
 		btVector3 cPoly = m_bodies[BODYPART_FOOT]->getWorldTransform() * btVector3(0.0f, -0.025f, 0.0f);
 
-		/*
-		btVector3 COM;
-		COM = computeCenterOfMass();
-
-		COM = groundProjFromObject(m_bodies[Creature::BODYPART_FOOT]) * COM;
-		*/
-
-		
 		for (int i = 0; i < Creature::JOINT_COUNT; i++)
 		{
 			btHingeConstraint* currentJoint = ((btHingeConstraint*)m_joints[i]);
@@ -206,60 +199,25 @@ void Creature::update(int elapsedTime) {
 
 			btTransform bodyRot = bodySpace;
 			bodyRot.setOrigin(btVector3(0,0,0));
-			btVector3 grav = (bodyRot * btVector3(0, -1, 0)).normalize();
-			btVector3 comTotal = bodySpace * computeCenterOfMass();
-			btVector3 csp = -(comTotal-(bodySpace * cPoly));
-			btVector3 projOnCSP = csp - (csp.dot(grav) * grav);
+
+			btVector3 gravityDirection = (bodyRot * btVector3(0, -1, 0)).normalize();
+			btVector3 comTotal = bodySpace * computeCenterOfMass((Part)(i+1));
+			btVector3 csp = -((comTotal - jointSpace.getOrigin())-(bodySpace * cPoly));
+			btVector3 projOnCSP = csp - (csp.dot(gravityDirection) * gravityDirection);
 
 			btTransform jointRot = jointSpace;
 			jointRot.setOrigin(btVector3(0,0,0));
 			btVector3 errorAxis = jointRot * btVector3(1,0,0);
 			btScalar error = projOnCSP.dot(errorAxis);
+			btScalar errorDiff = (error - prevError[i]) / (float)elapsedTime;
 
-			float length = (bodySpace * computeCenterOfMass((Part)(i+1))).distance(jointSpace.getOrigin());
-			
-#define CLAMP(a,b,c) ((a) < (b) ? (b) : ((a) > (c) ? (c) : (a)))
+#define	GAINSP 15.0f
+#define GAINSD 20.0f
 
-#define ERRORMULT 4.0f
-#define MOTORTARGETMULT 2.0f
+			currentJoint->setMotorTarget( (error * GAINSP + errorDiff * GAINSD) ); 
 
-			float target = acos(-CLAMP(((ERRORMULT * error) * (totMass - massAbove))/(length * massAbove), -1.0f, 1.0f)) - M_PI_2;
-			float cAngle = currentJoint->getHingeAngle();
-
-			float diff = target - cAngle;
-			float moment = length * massAbove;
-
-			//currentJoint->setMotorTarget( diff * moment * MOTORTARGETMULT ); 
-			currentJoint->setMotorTarget( error * 10.0f ); 
+			prevError[i] = error;
 		}
-
-		//((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() ) * 20.0f );
-		//((btHingeConstraint*)m_joints[Creature::JOINT_KNEE])->setMotorTarget( btScalar(- COM.x() ) * 25.0f );
-
-		//=================== TODO ===================//
-
-		// Step 2: Describe the ground projected CSP in world coordinate system
-
-		// ANKLE
-		// -----
-
-		// Step 3.1: Describe the ground projected CSP in foot coordinate system
-		// Step 3.2: Describe the ground projected COM in foot coordinate system
-		// Step 3.3: Calculate the balance error solveable by an ankle rotation (inverted pendulum model)
-		// Step 3.4: Feed the error to the PD controller and apply resulting 'torque' (here angular motor velocity)
-		// (Conversion between error to torque/motor velocity done by gains in PD controller)
-
-		// KNEE
-		// ----
-
-		// Step 4.1: Describe the ground projected CSP in lower leg coordinate system
-		// Step 4.2: Describe the ground projected COM in lower leg coordinate system
-		// Step 4.3: Calculate the balance error solveable by a knee rotation (inverted pendulum model)
-		// Step 4.4: Feed the error to the PD controller and apply resulting 'torque' (here angular motor velocity)
-		// (Conversion between error to torque/motor velocity done by gains in PD controller)
-
-		//===========================================//
-
 	}
 }
 
