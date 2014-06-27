@@ -181,7 +181,8 @@ void Creature::update(int elapsedTime) {
 	if (elapsedTime - lastChange > 10) { // Update balance control only every 10 ms
 		lastChange = elapsedTime;
 
-		btVector3 comFoot = m_bodies[BODYPART_FOOT]->getCenterOfMassPosition();
+		//btVector3 comFoot = m_bodies[BODYPART_FOOT]->getCenterOfMassPosition();
+		btVector3 cPoly = m_bodies[BODYPART_FOOT]->getWorldTransform() * btVector3(0.0f, -0.025f, 0.0f);
 
 		/*
 		btVector3 COM;
@@ -207,7 +208,7 @@ void Creature::update(int elapsedTime) {
 			bodyRot.setOrigin(btVector3(0,0,0));
 			btVector3 grav = (bodyRot * btVector3(0, -1, 0)).normalize();
 			btVector3 comTotal = bodySpace * computeCenterOfMass();
-			btVector3 csp = -(comTotal-(bodySpace * comFoot));
+			btVector3 csp = -(comTotal-(bodySpace * cPoly));
 			btVector3 projOnCSP = csp - (csp.dot(grav) * grav);
 
 			btTransform jointRot = jointSpace;
@@ -219,11 +220,17 @@ void Creature::update(int elapsedTime) {
 			
 #define CLAMP(a,b,c) ((a) < (b) ? (b) : ((a) > (c) ? (c) : (a)))
 
-			float target = acos(-CLAMP((error * totMass)/(length * massAbove), -1.0f, 1.0f)) - M_PI_2;
+#define ERRORMULT 4.0f
+#define MOTORTARGETMULT 2.0f
+
+			float target = acos(-CLAMP(((ERRORMULT * error) * (totMass - massAbove))/(length * massAbove), -1.0f, 1.0f)) - M_PI_2;
 			float cAngle = currentJoint->getHingeAngle();
 
-			//currentJoint->setMotorTarget( (target - cAngle) ); //This one should work, but doesn't for some reason.
-			currentJoint->setMotorTarget(error * 10.0f);
+			float diff = target - cAngle;
+			float moment = length * massAbove;
+
+			//currentJoint->setMotorTarget( diff * moment * MOTORTARGETMULT ); 
+			currentJoint->setMotorTarget( error * 10.0f ); 
 		}
 
 		//((btHingeConstraint*)m_joints[Creature::JOINT_ANKLE])->setMotorTarget( btScalar( COM.z() ) * 20.0f );
