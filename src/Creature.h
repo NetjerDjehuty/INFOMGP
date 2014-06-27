@@ -7,10 +7,9 @@
 #define	GAINSP 10.0f
 #define GAINSD 100.0f
 
-#define EXTRAPARTS 4
+#define EXTRAPARTS 0
 #define EXTRAPARTSLENGTH 0.1f
 #define EXTRAPARTSWEIGHT 0.5f
-
 
 
 
